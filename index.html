@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KCPH Interview Scoring — Multi-Interviewer</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#1a1916;--ink2:#4a4845;--ink3:#888580;--ink4:#b8b5b0;
+  --paper:#faf9f7;--paper2:#f3f1ed;--paper3:#e8e5e0;--paper4:#dedad4;
+  --teal:#0f6e56;--teal2:#1d9e75;--teal3:#5dcaa5;--teal4:#e1f5ee;
+  --amber:#ba7517;--amber2:#ef9f27;--amber3:#fac775;--amber4:#faeeda;
+  --red:#a32d2d;--red2:#e24b4a;--red3:#f09595;--red4:#fcebeb;
+  --blue:#185fa5;--blue4:#e6f1fb;
+  --r:10px;--r-sm:6px;--r-lg:14px;
+  --sh:0 1px 4px rgba(0,0,0,.07),0 4px 16px rgba(0,0,0,.06);
+  --sh-lg:0 8px 32px rgba(0,0,0,.13);
+}
+body{font-family:'Outfit',sans-serif;background:var(--paper2);color:var(--ink);font-size:14px;line-height:1.5}
+h1,h2,h3,h4{font-family:'Playfair Display',serif;font-weight:500;line-height:1.25}
+.screen{display:none;min-height:100vh;flex-direction:column}
+.screen.active{display:flex}
+.topbar{height:52px;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 24px;position:sticky;top:0;z-index:100;flex-shrink:0}
+.topbar-brand{display:flex;align-items:center;gap:10px}
+.brand-mark{width:32px;height:32px;background:var(--teal);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:13px;color:#fff}
+.brand-title{font-size:13px;font-weight:500}.brand-sub{font-size:10px;opacity:.5;margin-top:1px}
+.topbar-right{display:flex;align-items:center;gap:8px}
+.tb-badge{font-size:11px;padding:3px 10px;border-radius:99px;background:rgba(255,255,255,.12);color:rgba(255,255,255,.85)}
+.tb-btn{padding:5px 12px;border-radius:var(--r-sm);font-size:12px;font-weight:500;cursor:pointer;border:1px solid rgba(255,255,255,.25);color:#fff;background:transparent;font-family:inherit;transition:all .15s}
+.tb-btn:hover{background:rgba(255,255,255,.12)}
+.tb-btn-white{background:#fff;color:var(--teal);border-color:#fff}.tb-btn-white:hover{background:var(--teal4)}
+.tb-btn-teal{background:var(--teal2);border-color:var(--teal2)}.tb-btn-teal:hover{background:var(--teal)}
+.app-body{display:flex;flex:1;overflow:hidden;height:calc(100vh - 52px)}
+.sidebar{width:240px;min-width:240px;background:#fff;border-right:1px solid var(--paper3);display:flex;flex-direction:column;overflow-y:auto}
+.main{flex:1;overflow-y:auto;padding:24px 28px}
+.sb-section{padding:12px 14px 6px}
+.sb-label{font-size:10px;font-weight:600;letter-spacing:.08em;color:var(--ink3);text-transform:uppercase;margin-bottom:6px}
+.sb-list{padding:0 6px 12px}
+.sb-item{padding:8px 10px;border-radius:var(--r-sm);cursor:pointer;margin-bottom:1px;display:flex;align-items:center;gap:9px;border:1px solid transparent;transition:all .12s}
+.sb-item:hover{background:var(--paper2)}.sb-item.active{background:var(--teal4);border-color:#9fe1cb}
+.sb-item.active .si-name{color:var(--teal);font-weight:500}
+.si-av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex-shrink:0}
+.av-doctor{background:var(--blue4);color:var(--blue)}.av-nurse{background:var(--teal4);color:var(--teal)}
+.si-info{flex:1;min-width:0}.si-name{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.si-sub{font-size:10px;color:var(--ink3)}
+.si-pct{font-size:11px;font-weight:600;padding:2px 6px;border-radius:99px;flex-shrink:0}
+.pct-na{background:var(--paper3);color:var(--ink3)}.pct-lo{background:var(--red4);color:var(--red)}
+.pct-mid{background:var(--amber4);color:var(--amber)}.pct-hi{background:var(--teal4);color:var(--teal)}
+.sb-add{margin:0 12px 12px;padding:8px;border:1px dashed var(--paper4);border-radius:var(--r-sm);text-align:center;cursor:pointer;color:var(--teal);font-size:12px;font-weight:500;background:none;font-family:inherit;width:calc(100% - 24px);transition:all .12s}
+.sb-add:hover{background:var(--teal4);border-color:var(--teal3)}
+.sb-footer{margin-top:auto;padding:12px 14px;border-top:1px solid var(--paper3)}
+.sb-stat{display:flex;justify-content:space-between;font-size:11px;color:var(--ink3);margin-bottom:3px}
+.sb-stat strong{color:var(--ink);font-weight:500}
+.card{background:#fff;border:1px solid var(--paper3);border-radius:var(--r);box-shadow:var(--sh)}
+.card-pad{padding:18px 22px}
+.summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px}
+.sum-card{background:#fff;border:1px solid var(--paper3);border-radius:var(--r);padding:14px 16px;text-align:center;box-shadow:var(--sh)}
+.sum-label{font-size:10px;color:var(--ink3);font-weight:500;letter-spacing:.03em;margin-bottom:4px}
+.sum-val{font-family:'Playfair Display',serif;font-size:26px;font-weight:500}
+.sv-teal{color:var(--teal)}.sv-ink{color:var(--ink)}.sv-amber{color:var(--amber)}.sv-gray{color:var(--ink3)}
+.cand-hdr{background:#fff;border:1px solid var(--paper3);border-radius:var(--r);padding:18px 22px;margin-bottom:16px;display:flex;align-items:center;gap:18px;box-shadow:var(--sh)}
+.cand-av-lg{width:50px;height:50px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:18px;font-weight:500}
+.cand-meta{flex:1}.cand-meta h2{font-size:18px;margin-bottom:2px}.cand-meta p{font-size:12px;color:var(--ink3)}
+.role-pill{font-size:10px;font-weight:600;padding:2px 8px;border-radius:99px;margin-left:7px;letter-spacing:.03em}
+.rp-doc{background:var(--blue4);color:var(--blue)}.rp-nur{background:var(--teal4);color:var(--teal)}
+.prog-wrap{display:flex;align-items:center;gap:8px;margin-top:7px}
+.prog-track{flex:1;height:3px;background:var(--paper3);border-radius:2px;overflow:hidden}
+.prog-fill{height:100%;background:var(--teal2);border-radius:2px;transition:width .3s}
+.prog-txt{font-size:10px;color:var(--ink3);white-space:nowrap}
+.view-tabs{display:flex;border-bottom:1px solid var(--paper3);margin-bottom:18px}
+.vt{padding:9px 16px;font-size:13px;font-weight:500;color:var(--ink3);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s}
+.vt:hover{color:var(--ink2)}.vt.active{color:var(--teal);border-bottom-color:var(--teal2)}
+.cat-sec{background:#fff;border:1px solid var(--paper3);border-radius:var(--r);margin-bottom:14px;box-shadow:var(--sh);overflow:hidden}
+.cat-hdr{padding:13px 18px;display:flex;align-items:center;gap:11px;border-bottom:1px solid var(--paper3);cursor:pointer;user-select:none}
+.cat-hdr:hover{background:var(--paper2)}
+.cat-ico{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.cat-name{font-size:13px;font-weight:500;flex:1}.cat-wt{font-size:11px;color:var(--ink3)}
+.cat-avg-pill{font-size:11px;font-weight:600;padding:3px 9px;border-radius:99px;min-width:48px;text-align:center}
+.chev{font-size:9px;color:var(--ink4);transition:transform .18s}.chev.open{transform:rotate(180deg)}
+.cat-body{padding:16px 18px}
+.q-box{background:var(--paper2);border:1px solid var(--paper3);border-radius:var(--r-sm);padding:10px 14px;font-size:13px;line-height:1.6;margin-bottom:14px;color:var(--ink)}
+.ql{font-size:10px;font-weight:600;color:var(--ink3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:5px}
+.iwr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;margin-bottom:12px}
+.iwr-card{border:1px solid var(--paper3);border-radius:var(--r-sm);padding:10px 12px;background:var(--paper2);position:relative}
+.iwr-name{font-size:11px;font-weight:600;color:var(--ink2);margin-bottom:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.iwr-btns{display:flex;gap:4px;flex-wrap:wrap}
+.ibtn{width:28px;height:28px;border-radius:var(--r-sm);border:1px solid var(--paper4);background:#fff;cursor:pointer;font-size:12px;font-weight:600;font-family:inherit;color:var(--ink2);transition:all .12s;display:flex;align-items:center;justify-content:center}
+.ibtn:hover{border-color:var(--teal3)}
+.ibtn.s1{background:var(--red4);border-color:var(--red3);color:var(--red)}
+.ibtn.s2{background:var(--amber4);border-color:var(--amber3);color:var(--amber)}
+.ibtn.s3{background:var(--teal4);border-color:var(--teal3);color:var(--teal)}
+.ibtn.s4{background:#c0dd97;border-color:#639922;color:#27500a}
+.ibtn.s5{background:var(--teal2);border-color:var(--teal);color:#fff}
+.iwr-avg{position:absolute;top:8px;right:10px;font-size:12px;font-weight:600;color:var(--teal);font-family:'Playfair Display',serif}
+.iwr-note{width:100%;padding:6px 9px;border:1px solid var(--paper3);border-radius:var(--r-sm);font-family:inherit;font-size:11px;color:var(--ink);resize:vertical;min-height:48px;outline:none;margin-top:8px;background:#fff}
+.iwr-note:focus{border-color:var(--teal3)}.iwr-note::placeholder{color:var(--ink4)}
+.avg-bar-wrap{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.avg-bar-label{font-size:11px;color:var(--ink3);width:88px;flex-shrink:0}
+.avg-bar-track{flex:1;height:6px;background:var(--paper3);border-radius:3px;overflow:hidden}
+.avg-bar-fill{height:100%;border-radius:3px;background:var(--teal2);transition:width .3s}
+.avg-bar-val{font-size:12px;font-weight:600;color:var(--teal);width:32px;text-align:right;flex-shrink:0}
+.rec-sec{background:#fff;border:1px solid var(--paper3);border-radius:var(--r);padding:18px 22px;margin-bottom:18px;box-shadow:var(--sh)}
+.rec-iwr-card{border:1px solid var(--paper3);border-radius:var(--r-sm);padding:10px 12px;background:var(--paper2)}
+.rec-iwr-name{font-size:11px;font-weight:600;color:var(--ink2);margin-bottom:7px}
+.rbtn{padding:5px 9px;border-radius:var(--r-sm);border:1px solid var(--paper4);background:#fff;cursor:pointer;font-family:inherit;font-size:11px;font-weight:500;transition:all .12s;color:var(--ink2)}
+.rbtn:hover{background:var(--paper2)}.r-hire{background:var(--teal4);border-color:var(--teal3);color:var(--teal)}
+.r-hold{background:var(--amber4);border-color:var(--amber3);color:var(--amber)}.r-decl{background:var(--red4);border-color:var(--red3);color:var(--red)}
+.con-item{font-size:12px;padding:4px 12px;border-radius:99px;font-weight:500}
+.con-hire{background:var(--teal4);color:var(--teal)}.con-hold{background:var(--amber4);color:var(--amber)}.con-decl{background:var(--red4);color:var(--red)}
+.action-bar{display:flex;gap:8px;justify-content:flex-end;margin-bottom:16px}
+.btn{padding:8px 16px;border-radius:var(--r-sm);font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .15s;border:none}
+.btn-primary{background:var(--teal);color:#fff}.btn-primary:hover{background:var(--teal2)}
+.btn-sec{background:#fff;color:var(--ink2);border:1px solid var(--paper3)}.btn-sec:hover{background:var(--paper2)}
+.modal-bg{position:fixed;inset:0;background:rgba(26,25,22,.45);z-index:300;display:flex;align-items:center;justify-content:center;animation:fi .15s}
+@keyframes fi{from{opacity:0}to{opacity:1}}
+.modal{background:#fff;border-radius:var(--r-lg);padding:28px;width:480px;max-width:95vw;box-shadow:var(--sh-lg);animation:su .18s}
+@keyframes su{from{transform:translateY(10px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal h3{font-size:20px;margin-bottom:4px}.modal .modal-sub{font-size:13px;color:var(--ink3);margin-bottom:20px}
+.fg{margin-bottom:13px}.fl{font-size:12px;font-weight:500;color:var(--ink2);margin-bottom:4px;display:block}
+.fi,.fs{width:100%;padding:9px 12px;border:1px solid var(--paper3);border-radius:var(--r-sm);font-family:inherit;font-size:13px;color:var(--ink);outline:none;transition:border .12s;background:#fff}
+.fi:focus,.fs:focus{border-color:var(--teal3)}.ma{display:flex;gap:8px;justify-content:flex-end;margin-top:20px}
+.iwr-login-btn{padding:11px 16px;border-radius:var(--r-sm);border:1px solid var(--paper3);background:#fff;cursor:pointer;font-family:inherit;font-size:13px;font-weight:500;color:var(--ink);transition:all .15s;text-align:left;display:flex;align-items:center;gap:10px}
+.iwr-login-btn:hover{background:var(--teal4);border-color:var(--teal3);color:var(--teal)}.iwr-login-btn.selected{background:var(--teal);color:#fff;border-color:var(--teal)}
+.il-av{width:30px;height:30px;border-radius:50%;background:var(--paper2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0}
+.iwr-login-btn.selected .il-av{background:rgba(255,255,255,.2);color:#fff}
+.setup-step{background:#fff;border:1px solid var(--paper3);border-radius:var(--r-lg);padding:28px;margin-bottom:20px;box-shadow:var(--sh)}
+.setup-step h3{font-size:18px;margin-bottom:4px}.setup-step .ssub{font-size:12px;color:var(--ink3);margin-bottom:18px}
+.iwr-chip{display:flex;align-items:center;gap:6px;padding:5px 10px 5px 8px;border-radius:99px;border:1px solid var(--paper3);background:var(--paper2);font-size:12px;font-weight:500;color:var(--ink2)}
+.chip-av{width:20px;height:20px;border-radius:50%;background:var(--teal4);color:var(--teal);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700}
+.chip-x{cursor:pointer;color:var(--ink3);font-size:14px;line-height:1;transition:color .1s}.chip-x:hover{color:var(--red)}
+.cand-row-setup{display:flex;align-items:center;gap:10px;padding:9px 12px;border:1px solid var(--paper3);border-radius:var(--r-sm);background:var(--paper2)}
+.crs-info{flex:1;font-size:12px}.crs-name{font-weight:500}.crs-sub{color:var(--ink3);font-size:11px}
+.crs-del{cursor:pointer;color:var(--ink4);font-size:16px;transition:color .1s}.crs-del:hover{color:var(--red)}
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:65%;gap:12px;text-align:center;color:var(--ink3)}
+.empty-ico{font-size:44px;opacity:.25}.empty h3{font-size:16px;font-weight:500;color:var(--ink2)}.empty p{font-size:12px;max-width:260px;line-height:1.6}
+/* sync status bar */
+.sync-bar{display:flex;align-items:center;gap:8px;padding:6px 14px;border-radius:var(--r-sm);font-size:12px;margin-bottom:14px;border:1px solid transparent}
+.sync-ok{background:var(--teal4);border-color:var(--teal3);color:var(--teal)}
+.sync-err{background:var(--red4);border-color:var(--red3);color:var(--red)}
+.sync-pending{background:var(--amber4);border-color:var(--amber3);color:var(--amber)}
+.sync-idle{background:var(--paper3);color:var(--ink3)}
+.sync-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.dot-ok{background:var(--teal2)}.dot-err{background:var(--red2)}.dot-pending{background:var(--amber2)}.dot-idle{background:var(--ink4)}
+.rank-tbl{width:100%;border-collapse:collapse}
+.rank-tbl th{background:var(--paper2);padding:9px 13px;font-size:10px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:.05em;text-align:left;border-bottom:1px solid var(--paper3)}
+.rank-tbl td{padding:10px 13px;border-bottom:1px solid var(--paper2);font-size:12px}
+.rank-tbl tr:hover td{background:var(--paper2)}.rank-n{font-weight:700;font-family:'Playfair Display',serif;color:var(--ink3)}
+.pct-mini{height:4px;background:var(--paper3);border-radius:2px;margin-top:3px;overflow:hidden}
+.pct-mini-fill{height:100%;background:var(--teal2);border-radius:2px}
+.admin-link{font-size:12px;color:var(--teal);cursor:pointer;text-decoration:underline}
+hr.div{border:none;border-top:1px solid var(--paper3);margin:14px 0}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:4px}
+.spinner-teal{border-color:rgba(15,110,86,.2);border-top-color:var(--teal)}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════ SETUP ════ -->
+<div id="screen-setup" class="screen active">
+  <div class="topbar">
+    <div class="topbar-brand"><div class="brand-mark">KC</div><div><div class="brand-title">KCPH Interview System</div><div class="brand-sub">Admin Setup</div></div></div>
+    <div class="topbar-right">
+      <button class="tb-btn" onclick="testConnection()" id="btn-test-conn">Test connection</button>
+      <button class="tb-btn tb-btn-white" onclick="launchSession()">Launch session ›</button>
+    </div>
+  </div>
+  <div style="max-width:660px;margin:36px auto;padding:0 20px;">
+    <div style="margin-bottom:24px;"><h1 style="font-size:26px;margin-bottom:6px;">Session setup</h1>
+    <p style="font-size:13px;color:var(--ink3);">Configure Google Sheets connection, interviewers, and candidates before launching.</p></div>
+
+    <!-- GOOGLE SHEETS -->
+    <div class="setup-step">
+      <h3>0. Google Sheets connection</h3>
+      <p class="ssub">Paste your Apps Script Web App URL below. All data will sync automatically to your spreadsheet.</p>
+      <div class="fg">
+        <label class="fl">Web App URL</label>
+        <input class="fi" id="gas-url" placeholder="https://script.google.com/macros/s/…/exec" value="https://script.google.com/macros/s/AKfycbzYiViYEEPP0NZToqzpfPOWaVihhXjqps_Q2RYS2SdWWeueImTt_973yGMrUhXvl5Fomw/exec">
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <button class="btn btn-primary" onclick="saveGasUrl()">Save &amp; connect</button>
+        <button class="btn btn-sec" onclick="testConnection()">Test connection</button>
+        <div id="conn-status" class="sync-bar sync-idle" style="flex:1;"><span class="sync-dot dot-idle" id="conn-dot"></span><span id="conn-msg">Not connected</span></div>
+      </div>
+      <p style="font-size:11px;color:var(--ink3);margin-top:10px;">
+        &#9432; See the instructions panel below for how to deploy the Apps Script.
+      </p>
+    </div>
+
+    <!-- INTERVIEWERS -->
+    <div class="setup-step">
+      <h3>1. Interviewer panel</h3>
+      <p class="ssub">Add 5–7 interviewers. Each will log in separately and score candidates independently.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;" id="iwr-chip-list"></div>
+      <div style="display:flex;gap:8px;">
+        <input class="fi" id="iwr-inp" placeholder="Interviewer name (e.g. Dr. Tum Sambath)" style="flex:1;" onkeydown="if(event.key==='Enter')addInterviewer()">
+        <button class="btn btn-primary" onclick="addInterviewer()">Add</button>
+      </div>
+      <div id="iwr-count-msg" style="font-size:11px;color:var(--ink3);margin-top:7px;"></div>
+    </div>
+
+    <!-- CANDIDATES -->
+    <div class="setup-step">
+      <h3>2. Candidate roster</h3>
+      <p class="ssub">Register all candidates before starting. Target: 2 doctors and 18 registered nurses.</p>
+      <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px;" id="cand-list-setup"></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <input class="fi" id="c-name-inp" placeholder="Full name" style="flex:2;min-width:140px;">
+        <select class="fs" id="c-role-inp" style="flex:1;min-width:120px;"><option value="doctor">Medical Doctor</option><option value="nurse">Registered Nurse</option></select>
+        <input class="fi" id="c-id-inp" placeholder="ID" style="flex:1;min-width:90px;">
+        <button class="btn btn-primary" onclick="addCandidate()">Add</button>
+      </div>
+    </div>
+
+    <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-sec" onclick="loadDemo()">Load demo data</button>
+        <button class="btn btn-sec" onclick="pullFromSheets()">&#8595; Pull from Sheets</button>
+      </div>
+      <button class="btn btn-primary" onclick="launchSession()">Launch scoring session ›</button>
+    </div>
+
+    <!-- INSTRUCTIONS -->
+    <div class="setup-step" style="margin-top:24px;background:var(--paper2);">
+      <h3 style="font-size:16px;">&#128218; How to deploy the Apps Script</h3>
+      <ol style="font-size:12px;color:var(--ink2);line-height:2;margin-top:10px;padding-left:18px;">
+        <li>Open your Google Spreadsheet → <strong>Extensions → Apps Script</strong></li>
+        <li>Delete any existing code in <code>Code.gs</code> and paste the entire <code>KCPH_Apps_Script.gs</code> file</li>
+        <li>Click <strong>Deploy → New deployment</strong></li>
+        <li>Type: <strong>Web app</strong> | Execute as: <strong>Me</strong> | Access: <strong>Anyone</strong></li>
+        <li>Click <strong>Deploy</strong> and copy the Web App URL</li>
+        <li>Paste the URL in the field above and click <strong>Save &amp; connect</strong></li>
+        <li>Click <strong>Test connection</strong> — you should see "Connected ✓"</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════ LOGIN ════ -->
+<div id="screen-login" class="screen">
+  <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--paper2);">
+    <div style="background:#fff;border:1px solid var(--paper3);border-radius:var(--r-lg);padding:40px;width:400px;max-width:95vw;box-shadow:var(--sh-lg);text-align:center;">
+      <div style="width:56px;height:56px;background:var(--teal);border-radius:14px;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:22px;color:#fff;margin:0 auto 20px;">KC</div>
+      <h2 style="font-size:22px;margin-bottom:6px;">Welcome</h2>
+      <p style="font-size:13px;color:var(--ink3);margin-bottom:28px;">Kampong Chhnang Provincial Hospital<br>2026 Recruitment — Interview Scoring</p>
+      <div id="login-sync-status" style="margin-bottom:14px;"></div>
+      <p style="font-size:12px;font-weight:500;color:var(--ink2);margin-bottom:10px;text-align:left;">Select your name to begin scoring:</p>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;" id="login-iwr-list"></div>
+      <button class="btn btn-primary" style="width:100%;margin-top:4px;" onclick="loginInterviewer()">Enter as selected interviewer ›</button>
+      <div style="font-size:11px;color:var(--ink4);margin:10px 0;">— or —</div>
+      <span class="admin-link" onclick="goSetup()">Admin setup</span> &nbsp;|&nbsp;
+      <span class="admin-link" onclick="goResults()">Results panel</span>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════ SCORING ════ -->
+<div id="screen-scoring" class="screen">
+  <div class="topbar">
+    <div class="topbar-brand"><div class="brand-mark">KC</div><div><div class="brand-title">KCPH Interview Scoring</div><div class="brand-sub">2026 Recruitment</div></div></div>
+    <div class="topbar-right">
+      <div id="sc-sync-indicator" class="tb-badge" style="font-size:10px;">&#9679; Offline</div>
+      <span class="tb-badge" id="sc-iwr-badge"></span>
+      <button class="tb-btn" onclick="syncNow('scoring')" id="btn-sync-sc">Sync to Sheets</button>
+      <button class="tb-btn" onclick="goLogin()">Switch interviewer</button>
+      <button class="tb-btn" onclick="goResults()">Results ›</button>
+    </div>
+  </div>
+  <div class="app-body">
+    <div class="sidebar">
+      <div class="sb-section"><div class="sb-label">Candidates</div></div>
+      <div class="sb-list" id="sc-cand-list"></div>
+      <div class="sb-footer">
+        <div class="sb-stat"><span>My scored</span><strong id="sc-stat-scored">0</strong></div>
+        <div class="sb-stat"><span>Total</span><strong id="sc-stat-total">0</strong></div>
+      </div>
+    </div>
+    <div class="main" id="sc-main">
+      <div class="empty" id="sc-empty"><div class="empty-ico">&#128196;</div><h3>Select a candidate</h3><p>Choose a candidate from the sidebar to begin scoring.</p></div>
+      <div id="sc-sheet" style="display:none;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════ RESULTS ════ -->
+<div id="screen-results" class="screen">
+  <div class="topbar">
+    <div class="brand-mark" style="margin-left:24px;">KC</div>
+    <div style="margin-left:10px;flex:1;"><div class="brand-title" style="color:#fff;">Results &amp; Rankings</div><div class="brand-sub">Aggregated scores from all interviewers</div></div>
+    <div class="topbar-right">
+      <div id="res-sync-indicator" class="tb-badge" style="font-size:10px;">&#9679; Offline</div>
+      <button class="tb-btn tb-btn-teal" onclick="syncNow('results')" id="btn-sync-res">&#8593; Push to Sheets</button>
+      <button class="tb-btn" onclick="pullFromSheets()" id="btn-pull-res">&#8595; Pull from Sheets</button>
+      <button class="tb-btn" onclick="goLogin()">Back to login</button>
+    </div>
+  </div>
+  <div class="app-body">
+    <div class="sidebar">
+      <div class="sb-section"><div class="sb-label">Candidates</div></div>
+      <div class="sb-list" id="res-cand-list"></div>
+      <div class="sb-footer">
+        <div class="sb-stat"><span>Doctors</span><strong id="res-stat-doc">—</strong></div>
+        <div class="sb-stat"><span>Nurses</span><strong id="res-stat-nur">—</strong></div>
+        <div class="sb-stat"><span>Interviewers</span><strong id="res-stat-iwr">—</strong></div>
+      </div>
+    </div>
+    <div class="main" id="res-main">
+      <div class="empty" id="res-empty"><div class="empty-ico">&#128202;</div><h3>Select a candidate</h3><p>Choose a candidate to view aggregated scores from all interviewers.</p></div>
+      <div id="res-sheet" style="display:none;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- modal -->
+<div class="modal-bg" id="modal-bg" style="display:none;" onclick="if(event.target===this)this.style.display='none'">
+  <div class="modal" onclick="event.stopPropagation()"><div id="modal-content"></div></div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════════
+   CATEGORIES
+══════════════════════════════════════════════════ */
+const CATS=[
+  {id:'general',label:'General & Personal',icon:'&#128100;',bg:'#E1F5EE',weight:10,
+   q:{doctor:"Why did you choose Kampong Chhnang Provincial Hospital, and where do you see yourself professionally in the next three to five years?",
+      nurse:"Why did you choose Kampong Chhnang Provincial Hospital, and where do you see yourself professionally in the next three to five years?"},
+   rubric:['No clear motivation; no goals','Vague answers; minimal reflection','Adequate motivation; some KCPH alignment','Clear motivation; good alignment with public health values','Exceptional insight; strong community commitment']},
+  {id:'clinical',label:'Clinical Competency',icon:'&#128137;',bg:'#E6F1FB',weight:25,
+   q:{doctor:"A 45-year-old presents with chest pain, diaphoresis, and shortness of breath. Walk through your immediate assessment and management in our resource-limited setting.",
+      nurse:"Describe the five rights of medication administration and explain how you verify each one before giving any drug."},
+   rubric:['Dangerous knowledge gaps; unsafe','Incomplete steps; significant errors','Adequate knowledge; minor gaps; generally safe','Good knowledge; structured systematic approach','Excellent; prioritized correctly; referenced local guidelines']},
+  {id:'ipc',label:'IPC & Patient Safety',icon:'&#128737;',bg:'#FAEEDA',weight:20,
+   q:{doctor:"What strategies do you use to prevent surgical site infections, and how would you respond immediately after a needlestick injury?",
+      nurse:"Describe the WHO five moments for hand hygiene. When is soap and water required over hand rub? How is medical waste segregated in Cambodia?"},
+   rubric:['No IPC awareness; unsafe response','Partial knowledge; misses key moments','Acceptable; covers standard precautions','Good; WHO moments correct; waste segregation accurate','Comprehensive; references National IPC Guidelines 2024; promotes safety culture']},
+  {id:'ethics',label:'Ethics & Conduct',icon:'&#9878;',bg:'#EEEDFE',weight:15,
+   q:{doctor:"A family offers money for better care. How do you handle this? Describe how you obtain informed consent from a patient with low literacy.",
+      nurse:"A senior colleague skips hand hygiene before a procedure and later speaks disrespectfully to a patient. How do you respond to each?"},
+   rubric:['Unethical; would not escalate','Hesitant; avoids difficult situations','Declines gift; reports concerns but lacks confidence','Clear ethical stance; professional; escalates appropriately','Exemplary; cites patient rights; demonstrates ethical leadership']},
+  {id:'admin',label:'Administrative Awareness',icon:'&#128196;',bg:'#F1EFE8',weight:10,
+   q:{doctor:"What do you understand about CHAS accreditation, and how do you ensure accurate clinical documentation in the national HIS?",
+      nurse:"What do you understand about hospital accreditation? How do you document adverse events or near-misses? Have you ever filed an incident report?"},
+   rubric:['No accreditation/documentation awareness','Minimal awareness; poor documentation habits','Basic understanding; inconsistent documentation','Good CHAS awareness; systematic documentation','Excellent; proactive quality improvement mindset; strong HIS awareness']},
+  {id:'emergency',label:'Emergency Scenario',icon:'&#128680;',bg:'#FCEBEB',weight:15,
+   q:{doctor:"Three critically ill patients arrive simultaneously: cardiac arrest, severe respiratory distress, and major trauma. How do you triage and respond?",
+      nurse:"You find a patient unresponsive in the ward. Walk through every step from the moment you discover them."},
+   rubric:['Incorrect sequence; patient at risk','Some correct steps but disordered; misses critical actions','Adequate response; calls for help; basic BLS correct','Systematic; correct triage/BLS; clear communication; delegates well','Outstanding; calm; structured; prioritizes correctly; activates team efficiently']},
+  {id:'situational',label:'Situational Judgment',icon:'&#129504;',bg:'#E1F5EE',weight:5,
+   q:{doctor:"You disagree with a clinical decision by the head of department that may harm the patient. How do you express your concern while respecting hierarchy?",
+      nurse:"An angry family is shouting at nursing staff in the ward corridor. You are the nurse on duty. How do you de-escalate the situation?"},
+   rubric:['Avoids conflict entirely or responds inappropriately','Hesitant; poor communication strategy','Addresses situation but lacks confidence or structure','Professional; calm; uses appropriate de-escalation','Exceptional communication; assertive yet respectful; patient-centred']}
+];
+
+/* ══════════════════════════════════════════════════
+   STATE + PERSISTENCE
+══════════════════════════════════════════════════ */
+let S={interviewers:[],candidates:[],scores:{},notes:{},recs:{},recNotes:{},gasUrl:'https://script.google.com/macros/s/AKfycbzYiViYEEPP0NZToqzpfPOWaVihhXjqps_Q2RYS2SdWWeueImTt_973yGMrUhXvl5Fomw/exec',sessionOpen:false};
+let currentInterviewer=null,currentCandidateScore=null,currentCandidateResults=null;
+
+function saveLocal(){localStorage.setItem('kcph_v3',JSON.stringify(S));}
+function loadLocal(){
+  const d=localStorage.getItem('kcph_v3');
+  if(d)try{S=JSON.parse(d);}catch(e){}
+  // Always enforce the correct GAS URL regardless of cached state
+  S.gasUrl='https://script.google.com/macros/s/AKfycbzYiViYEEPP0NZToqzpfPOWaVihhXjqps_Q2RYS2SdWWeueImTt_973yGMrUhXvl5Fomw/exec';
+}
+loadLocal();
+
+/* ══════════════════════════════════════════════════
+   GOOGLE APPS SCRIPT INTEGRATION
+══════════════════════════════════════════════════ */
+function gasUrl(){return S.gasUrl||'';}
+
+async function gasPost(body){
+  const url=gasUrl();
+  if(!url)throw new Error('No Web App URL configured. Please set it in Admin Setup.');
+  const res=await fetch(url,{method:'POST',body:JSON.stringify(body),headers:{'Content-Type':'text/plain'}});
+  const text=await res.text();
+  try{return JSON.parse(text);}catch(e){throw new Error('Invalid response from Apps Script: '+text.slice(0,120));}
+}
+
+function setSyncIndicator(elId,state,msg){
+  const el=document.getElementById(elId);if(!el)return;
+  const map={ok:'&#9679; Synced',err:'&#9679; Sync failed',pending:'&#9679; Syncing…',idle:'&#9679; Offline'};
+  el.textContent=(msg||map[state]||map.idle);
+  el.style.background=state==='ok'?'rgba(29,158,117,.2)':state==='err'?'rgba(163,45,45,.2)':state==='pending'?'rgba(186,117,23,.2)':'rgba(255,255,255,.12)';
+}
+
+function saveGasUrl(){
+  const v=document.getElementById('gas-url').value.trim();
+  if(!v){alert('Please enter the Web App URL.');return;}
+  S.gasUrl=v;saveLocal();
+  setConnStatus('pending','Testing…');
+  testConnection();
+}
+
+function setConnStatus(state,msg){
+  const bar=document.getElementById('conn-status');
+  const dot=document.getElementById('conn-dot');
+  if(!bar||!dot)return;
+  bar.className='sync-bar sync-'+state;
+  dot.className='sync-dot dot-'+state;
+  document.getElementById('conn-msg').textContent=msg||'';
+}
+
+async function testConnection(){
+  if(!gasUrl()){setConnStatus('err','No URL saved');return;}
+  setConnStatus('pending','Testing…');
+  try{
+    const r=await gasPost({action:'ping'});
+    if(r.ok){
+      setConnStatus('ok','Connected ✓  — '+r.message);
+      await gasPost({action:'setup'}); // create sheets if needed
+    }else{setConnStatus('err','Error: '+(r.error||'Unknown'));}
+  }catch(e){setConnStatus('err',e.message);}
+}
+
+/* full sync */
+async function syncNow(context){
+  const btnId=context==='scoring'?'btn-sync-sc':'btn-sync-res';
+  const indId=context==='scoring'?'sc-sync-indicator':'res-sync-indicator';
+  const btn=document.getElementById(btnId);
+  if(btn){btn.disabled=true;btn.innerHTML='<span class="spinner"></span>Syncing…';}
+  setSyncIndicator(indId,'pending');
+  try{
+    const r=await gasPost({action:'syncAll',data:{interviewers:S.interviewers,candidates:S.candidates,scores:S.scores,notes:S.notes,recs:S.recs,recNotes:S.recNotes}});
+    if(r.ok){setSyncIndicator(indId,'ok');}
+    else{setSyncIndicator(indId,'err','Sync failed');}
+  }catch(e){setSyncIndicator(indId,'err',e.message.slice(0,40));}
+  finally{if(btn){btn.disabled=false;btn.innerHTML=context==='scoring'?'Sync to Sheets':'&#8593; Push to Sheets';}}
+}
+
+/* real-time single-score push */
+async function pushScore(cid,iid,catId){
+  if(!gasUrl())return;
+  const c=S.candidates.find(x=>x.id===cid);
+  const iwr=S.interviewers.find(x=>x.id===iid);
+  if(!c||!iwr)return;
+  try{
+    await gasPost({action:'saveScore',data:{
+      candidateId:cid,candidateName:c.name,role:c.role,
+      interviewerId:iid,interviewerName:iwr.name,
+      catId,score:getScore(cid,iid,catId),notes:getNote(cid,iid,catId)
+    }});
+  }catch(e){console.warn('pushScore failed',e);}
+}
+
+async function pushRec(cid,iid){
+  if(!gasUrl())return;
+  const c=S.candidates.find(x=>x.id===cid);
+  const iwr=S.interviewers.find(x=>x.id===iid);
+  if(!c||!iwr)return;
+  try{
+    await gasPost({action:'saveRecommendation',data:{
+      candidateId:cid,candidateName:c.name,role:c.role,
+      interviewerId:iid,interviewerName:iwr.name,
+      rec:getRec(cid,iid),notes:getRecNote(cid,iid)
+    }});
+  }catch(e){console.warn('pushRec failed',e);}
+}
+
+/* pull from sheets → overwrite local state */
+async function pullFromSheets(){
+  if(!gasUrl()){alert('No Web App URL configured.');return;}
+  const btn=document.getElementById('btn-pull-res');
+  if(btn){btn.disabled=true;btn.innerHTML='<span class="spinner spinner-teal"></span>Loading…';}
+  try{
+    const r=await gasPost({action:'loadAll'});
+    if(!r.ok)throw new Error(r.error||'Failed');
+    S.interviewers=r.interviewers||S.interviewers;
+    S.candidates=r.candidates||S.candidates;
+    S.scores=r.scores||S.scores;
+    S.notes=r.notes||S.notes;
+    S.recs=r.recs||S.recs;
+    S.recNotes=r.recNotes||S.recNotes;
+    saveLocal();
+    renderSetup();
+    if(currentCandidateResults)selectCandidateResults(currentCandidateResults);
+    renderResultsSidebar();
+    alert('Data loaded from Google Sheets successfully.');
+  }catch(e){alert('Pull failed: '+e.message);}
+  finally{if(btn){btn.disabled=false;btn.innerHTML='&#8595; Pull from Sheets';}}
+}
+
+/* ══════════════════════════════════════════════════
+   HELPERS
+══════════════════════════════════════════════════ */
+function initials(n){return n.split(' ').slice(0,2).map(w=>w[0]||'').join('').toUpperCase()||'?';}
+function getScore(cid,iid,cat){return(S.scores[cid]&&S.scores[cid][iid]&&S.scores[cid][iid][cat])||0;}
+function setScoreLocal(cid,iid,cat,v){if(!S.scores[cid])S.scores[cid]={};if(!S.scores[cid][iid])S.scores[cid][iid]={};S.scores[cid][iid][cat]=v;saveLocal();}
+function getNote(cid,iid,cat){return(S.notes[cid]&&S.notes[cid][iid]&&S.notes[cid][iid][cat])||'';}
+function setNoteLocal(cid,iid,cat,v){if(!S.notes[cid])S.notes[cid]={};if(!S.notes[cid][iid])S.notes[cid][iid]={};S.notes[cid][iid][cat]=v;saveLocal();}
+function getRec(cid,iid){return(S.recs[cid]&&S.recs[cid][iid])||'';}
+function setRecLocal(cid,iid,v){if(!S.recs[cid])S.recs[cid]={};S.recs[cid][iid]=v;saveLocal();}
+function getRecNote(cid,iid){return(S.recNotes[cid]&&S.recNotes[cid][iid])||'';}
+function setRecNoteLocal(cid,iid,v){if(!S.recNotes[cid])S.recNotes[cid]={};S.recNotes[cid][iid]=v;saveLocal();}
+function calcIwrScore(cid,iid){let t=0,a=0;CATS.forEach(c=>{const s=getScore(cid,iid,c.id);if(s>0){t+=s*c.weight;a++;}});const mx=500;return{total:t,max:mx,answered:a,pct:Math.round(t/mx*100)};}
+function calcAvgScore(cid){let tp=0,n=0;S.interviewers.forEach(iwr=>{const s=calcIwrScore(cid,iwr.id);if(s.answered>0){tp+=s.pct;n++;}});const catAvgs={};CATS.forEach(cat=>{let sm=0,cn=0;S.interviewers.forEach(iwr=>{const s=getScore(cid,iwr.id,cat.id);if(s>0){sm+=s;cn++;}});catAvgs[cat.id]=cn>0?Math.round(sm/cn*10)/10:0;});return{pct:n>0?Math.round(tp/n):0,catAvgs,scoredBy:n};}
+function pctClass(p){if(!p)return'pct-na';if(p<50)return'pct-lo';if(p<70)return'pct-mid';return'pct-hi';}
+function iwrProgress(cid,iid){return CATS.filter(c=>getScore(cid,iid,c.id)>0).length;}
+
+/* ══════════════════════════════════════════════════
+   SCREEN NAV
+══════════════════════════════════════════════════ */
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('screen-'+id).classList.add('active');}
+function goSetup(){showScreen('setup');renderSetup();}
+function goLogin(){showScreen('login');renderLogin();}
+function goResults(){showScreen('results');renderResultsSidebar();currentCandidateResults=null;document.getElementById('res-empty').style.display='flex';document.getElementById('res-sheet').style.display='none';}
+
+/* ══════════════════════════════════════════════════
+   SETUP
+══════════════════════════════════════════════════ */
+function renderSetup(){
+  if(S.gasUrl)document.getElementById('gas-url').value=S.gasUrl;
+  const cl=document.getElementById('iwr-chip-list');
+  cl.innerHTML=S.interviewers.map(i=>`<div class="iwr-chip"><div class="chip-av">${initials(i.name)}</div>${i.name}<span class="chip-x" onclick="removeInterviewer('${i.id}')">&#215;</span></div>`).join('');
+  document.getElementById('iwr-count-msg').textContent=S.interviewers.length+' interviewer'+(S.interviewers.length!==1?'s':'')+' — recommended 5–7.';
+  const cl2=document.getElementById('cand-list-setup');
+  cl2.innerHTML=S.candidates.length?S.candidates.map(c=>`<div class="cand-row-setup"><div class="si-av ${c.role==='doctor'?'av-doctor':'av-nurse'}">${initials(c.name)}</div><div class="crs-info"><div class="crs-name">${c.name}</div><div class="crs-sub">${c.candidateId} &bull; ${c.role==='doctor'?'Medical Doctor':'Registered Nurse'}</div></div><span class="crs-del" onclick="removeCandidate('${c.id}')">&#215;</span></div>`).join(''):'<p style="font-size:12px;color:var(--ink3);padding:6px 0;">No candidates added yet.</p>';
+  const role=document.getElementById('c-role-inp').value;
+  const n=S.candidates.filter(c=>c.role===role).length+1;
+  document.getElementById('c-id-inp').value=(role==='doctor'?'MD':'RN')+'-'+String(n).padStart(3,'0');
+}
+document.getElementById('c-role-inp').onchange=()=>renderSetup();
+function addInterviewer(){const inp=document.getElementById('iwr-inp');const name=inp.value.trim();if(!name)return;S.interviewers.push({id:'iwr_'+Date.now(),name});inp.value='';saveLocal();renderSetup();}
+function removeInterviewer(id){S.interviewers=S.interviewers.filter(i=>i.id!==id);saveLocal();renderSetup();}
+function addCandidate(){const name=document.getElementById('c-name-inp').value.trim();if(!name){alert('Enter name.');return;}const role=document.getElementById('c-role-inp').value;const cid=document.getElementById('c-id-inp').value.trim();S.candidates.push({id:'c_'+Date.now(),name,role,candidateId:cid,date:new Date().toLocaleDateString('en-GB')});document.getElementById('c-name-inp').value='';saveLocal();renderSetup();}
+function removeCandidate(id){if(!confirm('Remove?'))return;S.candidates=S.candidates.filter(c=>c.id!==id);saveLocal();renderSetup();}
+function loadDemo(){S.interviewers=[{id:'iwr1',name:'Dr. Tum Sambath'},{id:'iwr2',name:'Dr. Sok Kong'},{id:'iwr3',name:'Dr. Von Thevy'},{id:'iwr4',name:'Dr. Hing Narat'},{id:'iwr5',name:'Dr. Yeap Kong'}];S.candidates=[{id:'c1',name:'Chan Sopheap',role:'doctor',candidateId:'MD-001',date:'24/03/2026'},{id:'c2',name:'Keo Dara',role:'doctor',candidateId:'MD-002',date:'24/03/2026'},{id:'c3',name:'Meas Channary',role:'nurse',candidateId:'RN-001',date:'24/03/2026'},{id:'c4',name:'Ros Sreymom',role:'nurse',candidateId:'RN-002',date:'24/03/2026'},{id:'c5',name:'Ly Bopha',role:'nurse',candidateId:'RN-003',date:'24/03/2026'}];saveLocal();renderSetup();}
+function launchSession(){if(!S.interviewers.length){alert('Add at least one interviewer.');return;}if(!S.candidates.length){alert('Add at least one candidate.');return;}S.sessionOpen=true;saveLocal();goLogin();}
+
+/* ══════════════════════════════════════════════════
+   LOGIN
+══════════════════════════════════════════════════ */
+let loginSelected=null;
+function renderLogin(){
+  loginSelected=null;
+  document.getElementById('login-iwr-list').innerHTML=S.interviewers.map(i=>`<button class="iwr-login-btn" id="lbtn-${i.id}" onclick="selectLoginIwr('${i.id}')"><div class="il-av">${initials(i.name)}</div>${i.name}</button>`).join('');
+  // show sync status
+  const div=document.getElementById('login-sync-status');
+  div.innerHTML=S.gasUrl?`<div class="sync-bar sync-ok" style="justify-content:center;"><span class="sync-dot dot-ok"></span>Sheets connected</div>`:`<div class="sync-bar sync-idle" style="justify-content:center;"><span class="sync-dot dot-idle"></span>Sheets not connected (offline mode)</div>`;
+}
+function selectLoginIwr(id){loginSelected=id;document.querySelectorAll('.iwr-login-btn').forEach(b=>b.classList.remove('selected'));document.getElementById('lbtn-'+id).classList.add('selected');}
+function loginInterviewer(){if(!loginSelected){alert('Select your name.');return;}currentInterviewer=S.interviewers.find(i=>i.id===loginSelected);showScreen('scoring');renderScoringScreen();}
+
+/* ══════════════════════════════════════════════════
+   SCORING SCREEN
+══════════════════════════════════════════════════ */
+function renderScoringScreen(){document.getElementById('sc-iwr-badge').textContent='Interviewer: '+currentInterviewer.name;renderScoringSidebar();currentCandidateScore=null;document.getElementById('sc-empty').style.display='flex';document.getElementById('sc-sheet').style.display='none';setSyncIndicator('sc-sync-indicator',S.gasUrl?'idle':'idle',S.gasUrl?'&#9679; Connected':'&#9679; Offline');}
+
+function renderScoringSidebar(){
+  const iid=currentInterviewer.id;
+  const list=document.getElementById('sc-cand-list');
+  let html='';
+  const groups=[['Medical Doctors',S.candidates.filter(c=>c.role==='doctor')],['Nurses',S.candidates.filter(c=>c.role==='nurse')]];
+  groups.forEach(([lbl,arr])=>{
+    if(!arr.length)return;
+    html+=`<div style="font-size:10px;font-weight:600;letter-spacing:.07em;color:var(--ink4);text-transform:uppercase;padding:5px 10px 3px;">${lbl}</div>`;
+    arr.forEach(c=>{const sc=calcIwrScore(c.id,iid);const prog=iwrProgress(c.id,iid);html+=`<div class="sb-item${c.id===currentCandidateScore?' active':''}" onclick="selectCandidateScore('${c.id}')"><div class="si-av ${c.role==='doctor'?'av-doctor':'av-nurse'}">${initials(c.name)}</div><div class="si-info"><div class="si-name">${c.name}</div><div class="si-sub">${c.candidateId} &bull; ${prog}/${CATS.length}</div></div><span class="si-pct ${pctClass(sc.answered>0?sc.pct:0)}">${sc.answered>0?sc.pct+'%':'—'}</span></div>`;});
+  });
+  list.innerHTML=html;
+  const scored=S.candidates.filter(c=>iwrProgress(c.id,iid)===CATS.length).length;
+  document.getElementById('sc-stat-scored').textContent=scored;
+  document.getElementById('sc-stat-total').textContent=S.candidates.length;
+}
+
+function selectCandidateScore(cid){currentCandidateScore=cid;renderScoringSidebar();const c=S.candidates.find(x=>x.id===cid);renderScoreSheet(c);document.getElementById('sc-empty').style.display='none';document.getElementById('sc-sheet').style.display='block';}
+
+function renderScoreSheet(c){
+  const iid=currentInterviewer.id;
+  const sc=calcIwrScore(c.id,iid);
+  let html=`<div class="cand-hdr"><div class="cand-av-lg ${c.role==='doctor'?'av-doctor':'av-nurse'}">${initials(c.name)}</div><div class="cand-meta"><h2>${c.name}<span class="role-pill ${c.role==='doctor'?'rp-doc':'rp-nur'}">${c.role==='doctor'?'Medical Doctor':'Registered Nurse'}</span></h2><p>${c.candidateId} &bull; ${c.date}</p><div class="prog-wrap"><div class="prog-track"><div class="prog-fill" style="width:${sc.answered/CATS.length*100}%"></div></div><span class="prog-txt">${sc.answered}/${CATS.length} scored &bull; ${sc.pct}%</span></div></div></div>`;
+  CATS.forEach(cat=>{
+    const s=getScore(c.id,iid,cat.id);const note=getNote(c.id,iid,cat.id);const q=cat.q[c.role]||cat.q.nurse;
+    html+=`<div class="cat-sec" id="cats-${cat.id}"><div class="cat-hdr" onclick="toggleCat('${cat.id}','s')"><div class="cat-ico" style="background:${cat.bg}">${cat.icon}</div><div class="cat-name">${cat.label}</div><div class="cat-wt">×${cat.weight}%</div><span class="cat-avg-pill ${pctClass(s?Math.round(s/5*100):0)}">${s?s+'/5':'—'}</span><span class="chev open" id="chev-s-${cat.id}">&#9660;</span></div>
+    <div class="cat-body" id="catbody-s-${cat.id}"><div class="ql">Question</div><div class="q-box">${q}</div>
+    <div class="ql" style="margin-top:10px;">Your score (1 = poor → 5 = excellent)</div>
+    <div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap;">${[1,2,3,4,5].map(n=>`<button class="ibtn ${s===n?'s'+n:''}" onclick="doSetScore('${c.id}','${iid}','${cat.id}',${n})" title="${cat.rubric[n-1]}">${n}</button>`).join('')}
+    <span style="font-size:11px;color:var(--ink3);align-self:center;margin-left:6px;">${s?'<strong style="color:var(--ink2);">'+['Poor','Weak','Fair','Good','Excellent'][s-1]+'</strong> — '+cat.rubric[s-1]:'Select a score'}</span></div>
+    <textarea class="iwr-note" placeholder="Your notes…" onblur="doSetNote('${c.id}','${iid}','${cat.id}',this.value)">${note}</textarea></div></div>`;
+  });
+  const rec=getRec(c.id,iid);const recNote=getRecNote(c.id,iid);
+  html+=`<div class="rec-sec"><div style="font-size:13px;font-weight:500;margin-bottom:12px;">Your recommendation</div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+    <button class="rbtn${rec==='hire'?' r-hire':''}" onclick="doSetRec('${c.id}','${iid}','hire')">&#10003; Recommend hire</button>
+    <button class="rbtn${rec==='hold'?' r-hold':''}" onclick="doSetRec('${c.id}','${iid}','hold')">&#8987; Hold / waitlist</button>
+    <button class="rbtn${rec==='decl'?' r-decl':''}" onclick="doSetRec('${c.id}','${iid}','decl')">&#10007; Do not recommend</button>
+  </div>
+  <textarea class="iwr-note" style="min-height:64px;" placeholder="Overall impression…" onblur="doSetRecNote('${c.id}','${iid}',this.value)">${recNote}</textarea></div>`;
+  document.getElementById('sc-sheet').innerHTML=html;
+}
+
+function toggleCat(id,p){const b=document.getElementById('catbody-'+p+'-'+id);const c=document.getElementById('chev-'+p+'-'+id);const h=b.style.display==='none';b.style.display=h?'':'none';c.classList.toggle('open',h);}
+
+function doSetScore(cid,iid,catId,v){
+  setScoreLocal(cid,iid,catId,v);
+  pushScore(cid,iid,catId);
+  const c=S.candidates.find(x=>x.id===cid);renderScoreSheet(c);renderScoringSidebar();
+  setSyncIndicator('sc-sync-indicator',S.gasUrl?'ok':'idle',S.gasUrl?'&#9679; Saved':'&#9679; Offline');
+}
+function doSetNote(cid,iid,catId,v){setNoteLocal(cid,iid,catId,v);pushScore(cid,iid,catId);}
+function doSetRec(cid,iid,v){setRecLocal(cid,iid,v);pushRec(cid,iid);const c=S.candidates.find(x=>x.id===cid);renderScoreSheet(c);}
+function doSetRecNote(cid,iid,v){setRecNoteLocal(cid,iid,v);pushRec(cid,iid);}
+
+/* ══════════════════════════════════════════════════
+   RESULTS SCREEN
+══════════════════════════════════════════════════ */
+function renderResultsSidebar(){
+  const sorted=(role)=>S.candidates.filter(c=>c.role===role).sort((a,b)=>calcAvgScore(b.id).pct-calcAvgScore(a.id).pct);
+  const list=document.getElementById('res-cand-list');let html='';
+  [['Medical Doctors','doctor'],['Nurses','nurse']].forEach(([lbl,role])=>{
+    const arr=sorted(role);if(!arr.length)return;
+    html+=`<div style="font-size:10px;font-weight:600;letter-spacing:.07em;color:var(--ink4);text-transform:uppercase;padding:5px 10px 3px;">${lbl}</div>`;
+    arr.forEach(c=>{const avg=calcAvgScore(c.id);html+=`<div class="sb-item${c.id===currentCandidateResults?' active':''}" onclick="selectCandidateResults('${c.id}')"><div class="si-av ${c.role==='doctor'?'av-doctor':'av-nurse'}">${initials(c.name)}</div><div class="si-info"><div class="si-name">${c.name}</div><div class="si-sub">${c.candidateId} &bull; ${avg.scoredBy} scorer${avg.scoredBy!==1?'s':''}</div></div><span class="si-pct ${pctClass(avg.pct)}">${avg.scoredBy>0?avg.pct+'%':'—'}</span></div>`;});
+  });
+  list.innerHTML=html;
+  document.getElementById('res-stat-doc').textContent=S.candidates.filter(c=>c.role==='doctor').length+'/2';
+  document.getElementById('res-stat-nur').textContent=S.candidates.filter(c=>c.role==='nurse').length+'/18';
+  document.getElementById('res-stat-iwr').textContent=S.interviewers.length;
+}
+
+function selectCandidateResults(cid){currentCandidateResults=cid;renderResultsSidebar();const c=S.candidates.find(x=>x.id===cid);renderResultsSheet(c);document.getElementById('res-empty').style.display='none';document.getElementById('res-sheet').style.display='block';}
+
+function renderResultsSheet(c){
+  const avg=calcAvgScore(c.id);
+  const recCounts={hire:0,hold:0,decl:0};
+  S.interviewers.forEach(iwr=>{const r=getRec(c.id,iwr.id);if(r&&recCounts[r]!==undefined)recCounts[r]++;});
+  const totalRec=Object.values(recCounts).reduce((a,b)=>a+b,0);
+  const consensus=totalRec>0?Object.entries(recCounts).sort((a,b)=>b[1]-a[1])[0][0]:'';
+  const consLabel={hire:'Hire',hold:'Hold',decl:'Decline','':'Pending'};
+  const consColor={hire:'var(--teal)',hold:'var(--amber)',decl:'var(--red)','':'var(--ink3)'};
+
+  let html=`
+  <div style="display:flex;gap:10px;justify-content:flex-end;margin-bottom:14px;">
+    <button class="btn btn-sec" onclick="syncNow('results')">&#8593; Push all to Sheets</button>
+    <button class="btn btn-sec" onclick="pullFromSheets()">&#8595; Pull from Sheets</button>
+  </div>
+  <div class="cand-hdr">
+    <div class="cand-av-lg ${c.role==='doctor'?'av-doctor':'av-nurse'}">${initials(c.name)}</div>
+    <div class="cand-meta"><h2>${c.name}<span class="role-pill ${c.role==='doctor'?'rp-doc':'rp-nur'}">${c.role==='doctor'?'Medical Doctor':'Registered Nurse'}</span></h2>
+    <p>${c.candidateId} &bull; ${c.date} &bull; Scored by ${avg.scoredBy} of ${S.interviewers.length} interviewer${S.interviewers.length!==1?'s':''}</p></div>
+  </div>
+  <div class="summary-grid">
+    <div class="sum-card"><div class="sum-label">Average score</div><div class="sum-val sv-teal">${avg.pct}%</div></div>
+    <div class="sum-card"><div class="sum-label">Scorers</div><div class="sum-val sv-ink">${avg.scoredBy}/${S.interviewers.length}</div></div>
+    <div class="sum-card"><div class="sum-label">Recommend hire</div><div class="sum-val sv-amber">${recCounts.hire}</div></div>
+    <div class="sum-card"><div class="sum-label">Consensus</div><div class="sum-val" style="font-size:15px;margin-top:6px;font-weight:600;color:${consColor[consensus]}">${consLabel[consensus]}</div></div>
+  </div>
+
+  <div class="card card-pad" style="margin-bottom:16px;">
+    <div style="font-size:13px;font-weight:500;margin-bottom:14px;">Category averages</div>
+    ${CATS.map(cat=>{const a=avg.catAvgs[cat.id];const pct=a>0?Math.round(a/5*100):0;return`<div class="avg-bar-wrap"><span class="avg-bar-label">${cat.label.split(' ').slice(0,2).join(' ')}</span><div class="avg-bar-track"><div class="avg-bar-fill" style="width:${pct}%"></div></div><span class="avg-bar-val">${a>0?a.toFixed(1):'—'}</span></div>`;}).join('')}
+  </div>`;
+
+  CATS.forEach(cat=>{
+    const q=cat.q[c.role]||cat.q.nurse;
+    let sm=0,cn=0;
+    S.interviewers.forEach(iwr=>{const s=getScore(c.id,iwr.id,cat.id);if(s>0){sm+=s;cn++;}});
+    const catAvg=cn>0?(sm/cn).toFixed(1):null;
+    html+=`<div class="cat-sec"><div class="cat-hdr" onclick="toggleCat('${cat.id}','r')"><div class="cat-ico" style="background:${cat.bg}">${cat.icon}</div><div class="cat-name">${cat.label}</div><div class="cat-wt">×${cat.weight}%</div><span class="cat-avg-pill ${pctClass(catAvg?Math.round(catAvg/5*100):0)}">${catAvg?'Avg '+catAvg:'—'}</span><span class="chev open" id="chev-r-${cat.id}">&#9660;</span></div>
+    <div class="cat-body" id="catbody-r-${cat.id}">
+      <div class="ql">Question</div><div class="q-box">${q}</div>
+      <div class="ql" style="margin-top:12px;">Individual scores</div>
+      <div class="iwr-grid">${S.interviewers.map(iwr=>{const s=getScore(c.id,iwr.id,cat.id);const note=getNote(c.id,iwr.id,cat.id);return`<div class="iwr-card"><div class="iwr-name">${iwr.name}</div><div class="iwr-btns">${[1,2,3,4,5].map(n=>`<div class="ibtn ${s===n?'s'+n:''}">${n}</div>`).join('')}</div>${s?`<div class="iwr-avg">${s}/5</div>`:''} ${note?`<div style="font-size:11px;color:var(--ink3);margin-top:6px;font-style:italic;">"${note}"</div>`:''}</div>`;}).join('')}</div>
+    </div></div>`;
+  });
+
+  // recs
+  html+=`<div class="rec-sec"><div style="font-size:13px;font-weight:500;margin-bottom:12px;">Recommendations by interviewer</div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-bottom:14px;">
+  ${S.interviewers.map(iwr=>{const r=getRec(c.id,iwr.id);const rn=getRecNote(c.id,iwr.id);const rL={hire:'Recommend hire',hold:'Hold / waitlist',decl:'Do not recommend','':'(pending)'};const rC={hire:'r-hire',hold:'r-hold',decl:'r-decl','':''};return`<div class="rec-iwr-card"><div class="rec-iwr-name">${iwr.name}</div><span class="rbtn ${rC[r]}" style="cursor:default;">${rL[r]||rL['']}</span>${rn?`<div style="font-size:11px;color:var(--ink3);margin-top:7px;font-style:italic;">"${rn}"</div>`:''}</div>`;}).join('')}
+  </div>
+  <div style="font-size:12px;font-weight:500;color:var(--ink2);margin-bottom:8px;">Panel consensus</div>
+  <div style="display:flex;gap:6px;flex-wrap:wrap;">
+    ${recCounts.hire>0?`<span class="con-item con-hire">&#10003; Hire: ${recCounts.hire}</span>`:''}
+    ${recCounts.hold>0?`<span class="con-item con-hold">&#8987; Hold: ${recCounts.hold}</span>`:''}
+    ${recCounts.decl>0?`<span class="con-item con-decl">&#10007; Decline: ${recCounts.decl}</span>`:''}
+    ${totalRec===0?`<span style="font-size:12px;color:var(--ink3);">No recommendations yet.</span>`:''}
+  </div></div>
+
+  <!-- Inter-rater table -->
+  <div class="card card-pad" style="margin-bottom:20px;">
+    <div style="font-size:13px;font-weight:500;margin-bottom:14px;">Inter-rater comparison</div>
+    <div style="overflow-x:auto;">
+    <table style="width:100%;border-collapse:collapse;font-size:12px;">
+      <thead><tr>
+        <th style="text-align:left;padding:7px 10px;background:var(--paper2);color:var(--ink3);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--paper3);">Interviewer</th>
+        ${CATS.map(cat=>`<th style="text-align:center;padding:7px 6px;background:var(--paper2);color:var(--ink3);font-size:10px;font-weight:600;border-bottom:1px solid var(--paper3);">${cat.label.split(' ')[0]}</th>`).join('')}
+        <th style="text-align:center;padding:7px 10px;background:var(--paper2);color:var(--ink3);font-size:10px;font-weight:600;border-bottom:1px solid var(--paper3);">%</th>
+      </tr></thead><tbody>
+      ${S.interviewers.map(iwr=>{const sc=calcIwrScore(c.id,iwr.id);return`<tr><td style="padding:8px 10px;border-bottom:1px solid var(--paper2);font-weight:500;">${iwr.name}</td>${CATS.map(cat=>{const s=getScore(c.id,iwr.id,cat.id);return`<td style="text-align:center;padding:8px 6px;border-bottom:1px solid var(--paper2);"><span class="si-pct ${pctClass(s?Math.round(s/5*100):0)}">${s||'—'}</span></td>`;}).join('')}<td style="text-align:center;padding:8px 10px;border-bottom:1px solid var(--paper2);font-weight:600;color:var(--teal);">${sc.answered>0?sc.pct+'%':'—'}</td></tr>`;}).join('')}
+      <tr style="background:var(--paper2);">
+        <td style="padding:8px 10px;font-size:10px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:.04em;">Average</td>
+        ${CATS.map(cat=>{const a=avg.catAvgs[cat.id];return`<td style="text-align:center;padding:8px 6px;font-weight:700;color:var(--teal);">${a>0?a.toFixed(1):'—'}</td>`;}).join('')}
+        <td style="text-align:center;padding:8px 10px;font-weight:700;color:var(--teal);">${avg.pct?avg.pct+'%':'—'}</td>
+      </tr></tbody>
+    </table></div>
+  </div>`;
+
+  document.getElementById('res-sheet').innerHTML=html;
+}
+
+/* ══════════════════════════════════════════════════
+   INIT
+══════════════════════════════════════════════════ */
+// Pre-load URL if not already saved
+if(!S.gasUrl) S.gasUrl = 'https://script.google.com/macros/s/AKfycbzYiViYEEPP0NZToqzpfPOWaVihhXjqps_Q2RYS2SdWWeueImTt_973yGMrUhXvl5Fomw/exec';
+renderSetup();
+// Auto-connect on first load
+if(S.gasUrl) testConnection();
+if(S.sessionOpen&&S.interviewers.length>0)goLogin();
+</script>
+</body>
+</html>
