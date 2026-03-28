@@ -1,0 +1,1177 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>KCPH Interview Scoring</title>
+<link href="https://fonts.googleapis.com/css2?family=Hanuman:wght@400;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --teal:#0f6e56;--teal2:#1d9e75;--teal3:#5dcaa5;--teal4:#e1f5ee;
+  --amber:#ba7517;--amber2:#ef9f27;--amber3:#fac775;--amber4:#faeeda;
+  --red:#a32d2d;--red2:#e24b4a;--red3:#f09595;--red4:#fcebeb;
+  --blue:#185fa5;--blue4:#e6f1fb;
+  --ink:#1a1916;--ink2:#4a4845;--ink3:#888580;--ink4:#b8b5b0;
+  --paper:#faf9f7;--paper2:#f3f1ed;--paper3:#e8e5e0;--paper4:#dedad4;
+  --white:#ffffff;
+  --r:10px;--r-sm:6px;--r-lg:14px;
+  --sh:0 1px 4px rgba(0,0,0,.08),0 2px 12px rgba(0,0,0,.06);
+  --sh-lg:0 8px 32px rgba(0,0,0,.14);
+  --font-body:'Outfit','Hanuman',sans-serif;
+  --font-km:'Hanuman','Outfit',sans-serif;
+}
+html,body{height:100%;overflow:hidden;font-family:var(--font-body);font-size:14px;color:var(--ink);background:var(--paper2)}
+.km{font-family:var(--font-km);font-size:15px;line-height:1.8}
+.screen{display:none;height:100%;flex-direction:column;overflow:hidden;position:relative}
+.screen.active{display:flex}
+.topbar{flex-shrink:0;background:var(--ink);color:#fff;display:flex;align-items:center;gap:8px;padding:0 12px;height:50px;position:relative;z-index:50}
+.tb-mark{width:30px;height:30px;background:var(--teal);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0}
+.tb-titles{flex:1;min-width:0}
+.tb-title{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tb-sub{font-size:9px;opacity:.5}
+.tb-actions{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.tb-btn{padding:5px 10px;border-radius:var(--r-sm);font-size:11px;font-weight:500;cursor:pointer;border:1px solid rgba(255,255,255,.3);color:#fff;background:transparent;font-family:inherit;white-space:nowrap;transition:background .15s}
+.tb-btn:active{background:rgba(255,255,255,.15)}
+.tb-btn-teal{background:var(--teal2);border-color:var(--teal2)}
+.tb-btn-white{background:#fff;color:var(--teal);border-color:#fff}
+.sync-dot{display:inline-flex;align-items:center;gap:4px;font-size:10px;padding:3px 8px;border-radius:99px;background:rgba(255,255,255,.1);color:rgba(255,255,255,.8);white-space:nowrap}
+.sync-dot::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--ink4);flex-shrink:0}
+.sync-dot.ok::before{background:var(--teal3)}
+.sync-dot.err::before{background:var(--red3)}
+.sync-dot.busy::before{background:var(--amber3)}
+.app-body{display:flex;flex:1;overflow:hidden;position:relative}
+.sidebar{width:220px;min-width:220px;background:var(--white);border-right:1px solid var(--paper3);display:flex;flex-direction:column;overflow-y:auto;-webkit-overflow-scrolling:touch;transition:transform .22s cubic-bezier(.4,0,.2,1);z-index:40;will-change:transform}
+@media(max-width:600px){
+  .sidebar{position:fixed;top:50px;left:0;bottom:0;width:80vw;max-width:290px;transform:translateX(-105%);box-shadow:var(--sh-lg)}
+  .sidebar.open{transform:translateX(0)}
+}
+.sidebar-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.4);z-index:38;-webkit-tap-highlight-color:transparent}
+.sidebar-overlay.active{display:block}
+.sb-sect{padding:10px 12px 4px}
+.sb-lbl{font-size:9px;font-weight:700;letter-spacing:.08em;color:var(--ink3);text-transform:uppercase;margin-bottom:4px}
+.sb-list{padding:0 6px 8px}
+.sb-item{padding:8px 9px;border-radius:var(--r-sm);cursor:pointer;margin-bottom:2px;display:flex;align-items:center;gap:8px;border:1px solid transparent;transition:all .12s}
+.sb-item:active{background:var(--paper2)}
+.sb-item.active{background:var(--teal4);border-color:#9fe1cb}
+.sb-item.active .si-name{color:var(--teal);font-weight:600}
+.si-av{width:32px;height:32px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
+.av-doc{background:var(--blue4);color:var(--blue)}
+.av-nur{background:var(--teal4);color:var(--teal)}
+.av-rec{background:#EEEDFE;color:#3C3489}
+.av-pro{background:#FAEEDA;color:#BA7517}
+.si-info{flex:1;min-width:0}
+.si-name{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.si-sub{font-size:10px;color:var(--ink3)}
+.si-pct{font-size:10px;font-weight:700;padding:2px 6px;border-radius:99px;flex-shrink:0}
+.p-na{background:var(--paper3);color:var(--ink3)}.p-lo{background:var(--red4);color:var(--red)}.p-mid{background:var(--amber4);color:var(--amber)}.p-hi{background:var(--teal4);color:var(--teal)}
+.sb-footer{margin-top:auto;padding:10px 12px;border-top:1px solid var(--paper3)}
+.sb-stat{display:flex;justify-content:space-between;font-size:10px;color:var(--ink3);margin-bottom:2px}
+.sb-stat strong{color:var(--ink);font-weight:600}
+.main{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 14px 80px;min-width:0}
+@media(min-width:601px){.main{padding:20px 24px 40px}}
+.ham-btn{display:none;width:36px;height:36px;background:none;border:none;cursor:pointer;flex-shrink:0;align-items:center;justify-content:center;flex-direction:column;gap:5px;padding:4px}
+.ham-btn span{width:20px;height:2px;background:#fff;border-radius:2px;transition:all .2s;display:block}
+@media(max-width:600px){.ham-btn{display:flex}}
+.card{background:var(--white);border:1px solid var(--paper3);border-radius:var(--r);box-shadow:var(--sh);margin-bottom:12px}
+.card-pad{padding:14px 16px}
+.cand-hdr{background:var(--white);border:1px solid var(--paper3);border-radius:var(--r);padding:14px 16px;margin-bottom:12px;display:flex;align-items:center;gap:12px;box-shadow:var(--sh)}
+.cand-av{width:46px;height:46px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700}
+.cand-meta h2{font-size:16px;font-weight:600;line-height:1.2;margin-bottom:2px}
+.cand-meta p{font-size:11px;color:var(--ink3)}
+.rp{font-size:10px;font-weight:600;padding:2px 7px;border-radius:99px;margin-left:5px}
+.rp-doc{background:var(--blue4);color:var(--blue)}.rp-nur{background:var(--teal4);color:var(--teal)}.rp-rec{background:#EEEDFE;color:#3C3489}.rp-pro{background:#FAEEDA;color:#BA7517}
+.prog-wrap{display:flex;align-items:center;gap:6px;margin-top:6px}
+.prog-track{flex:1;height:4px;background:var(--paper3);border-radius:2px;overflow:hidden}
+.prog-fill{height:100%;background:var(--teal2);border-radius:2px;transition:width .3s}
+.prog-txt{font-size:10px;color:var(--ink3);white-space:nowrap}
+.view-tabs{display:flex;border-bottom:1px solid var(--paper3);margin-bottom:14px;overflow-x:auto}
+.vt{padding:8px 14px;font-size:12px;font-weight:500;color:var(--ink3);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap;transition:all .15s;flex-shrink:0}
+.vt.active{color:var(--teal);border-bottom-color:var(--teal2)}
+.cat-sec{background:var(--white);border:1px solid var(--paper3);border-radius:var(--r);margin-bottom:10px;box-shadow:var(--sh);overflow:hidden}
+.cat-hdr{padding:11px 14px;display:flex;align-items:center;gap:9px;border-bottom:1px solid var(--paper3);cursor:pointer;user-select:none}
+.cat-hdr:active{background:var(--paper2)}
+.cat-ico{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.cat-titles{flex:1;min-width:0}
+.cat-name-en{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cat-name-km{font-size:11px;color:var(--ink3);font-family:var(--font-km)}
+.cat-wt{font-size:10px;color:var(--ink3);flex-shrink:0}
+.cat-pill{font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;flex-shrink:0}
+.chev{font-size:9px;color:var(--ink4);transition:transform .18s;flex-shrink:0}
+.chev.open{transform:rotate(180deg)}
+.cat-body{padding:12px 14px}
+.q-lbl{font-size:9px;font-weight:700;color:var(--ink3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px}
+.q-box{background:var(--paper2);border:1px solid var(--paper3);border-radius:var(--r-sm);padding:10px 12px;margin-bottom:10px}
+.q-box .en{font-size:13px;line-height:1.55;color:var(--ink)}
+.q-box .km{font-size:13px;color:var(--ink2);margin-top:6px;padding-top:6px;border-top:1px solid var(--paper3);font-family:var(--font-km)}
+.score-row{display:flex;gap:5px;margin-bottom:8px;flex-wrap:nowrap}
+.s-btn{flex:1;min-width:0;padding:8px 4px;border-radius:var(--r-sm);border:1px solid var(--paper3);background:var(--white);cursor:pointer;font-family:inherit;transition:all .12s;display:flex;flex-direction:column;align-items:center;gap:2px}
+.s-btn .sn{font-size:18px;font-weight:700;line-height:1}
+.s-btn .sl{font-size:8px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;opacity:.7}
+.s-btn.v1{background:var(--red4);border-color:var(--red3);color:var(--red)}
+.s-btn.v2{background:var(--amber4);border-color:var(--amber3);color:var(--amber)}
+.s-btn.v3{background:var(--teal4);border-color:var(--teal3);color:var(--teal)}
+.s-btn.v4{background:#c0dd97;border-color:#639922;color:#27500a}
+.s-btn.v5{background:var(--teal2);border-color:var(--teal);color:#fff}
+.rubric-hint{font-size:11px;color:var(--ink3);font-style:italic;margin-top:4px;line-height:1.4}
+.note-field{width:100%;padding:8px 10px;border:1px solid var(--paper3);border-radius:var(--r-sm);font-family:inherit;font-size:12px;color:var(--ink);resize:vertical;min-height:60px;outline:none;background:var(--white);transition:border .12s}
+.note-field:focus{border-color:var(--teal3)}
+.note-field::placeholder{color:var(--ink4)}
+.rec-sec{background:var(--white);border:1px solid var(--paper3);border-radius:var(--r);padding:14px 16px;margin-bottom:12px;box-shadow:var(--sh)}
+.rec-btns{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0 12px}
+.rec-btn{flex:1;min-width:120px;padding:9px 10px;border-radius:var(--r-sm);border:1px solid var(--paper3);background:var(--white);cursor:pointer;font-family:inherit;font-size:12px;font-weight:500;transition:all .15s;text-align:center}
+.rec-btn .km{font-size:12px;display:block;margin-top:1px}
+.r-hire{background:var(--teal4);border-color:var(--teal3);color:var(--teal)}
+.r-hold{background:var(--amber4);border-color:var(--amber3);color:var(--amber)}
+.r-decl{background:var(--red4);border-color:var(--red3);color:var(--red)}
+.sum-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px}
+@media(min-width:500px){.sum-grid{grid-template-columns:repeat(4,1fr)}}
+.sum-card{background:var(--white);border:1px solid var(--paper3);border-radius:var(--r);padding:12px 14px;text-align:center;box-shadow:var(--sh)}
+.sum-lbl{font-size:10px;color:var(--ink3);margin-bottom:4px}
+.sum-val{font-size:24px;font-weight:700}
+.sv-teal{color:var(--teal)}.sv-ink{color:var(--ink)}.sv-amber{color:var(--amber)}
+.iwr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:6px;margin:8px 0}
+.iwr-card{border:1px solid var(--paper3);border-radius:var(--r-sm);padding:9px 10px;background:var(--paper2);position:relative}
+.iwr-name{font-size:10px;font-weight:700;color:var(--ink2);margin-bottom:6px;padding-right:28px;line-height:1.3;font-family:var(--font-km)}
+.iwr-score-row{display:flex;gap:3px}
+.isb{width:24px;height:24px;border-radius:4px;border:1px solid var(--paper4);background:var(--white);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--ink3)}
+.isb.v1{background:var(--red4);border-color:var(--red3);color:var(--red)}
+.isb.v2{background:var(--amber4);border-color:var(--amber3);color:var(--amber)}
+.isb.v3{background:var(--teal4);border-color:var(--teal3);color:var(--teal)}
+.isb.v4{background:#c0dd97;border-color:#639922;color:#27500a}
+.isb.v5{background:var(--teal2);border-color:var(--teal);color:#fff}
+.iwr-avg-badge{position:absolute;top:7px;right:8px;font-size:11px;font-weight:700;color:var(--teal)}
+.iwr-note-txt{font-size:10px;color:var(--ink3);margin-top:5px;font-style:italic;line-height:1.4}
+.avg-bar{display:flex;align-items:center;gap:7px;margin-bottom:8px}
+.avg-bar-lbl{font-size:10px;color:var(--ink3);width:72px;flex-shrink:0;line-height:1.3}
+.avg-bar-track{flex:1;height:6px;background:var(--paper3);border-radius:3px;overflow:hidden}
+.avg-bar-fill{height:100%;border-radius:3px;background:var(--teal2);transition:width .3s}
+.avg-bar-val{font-size:11px;font-weight:700;color:var(--teal);width:28px;text-align:right;flex-shrink:0}
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin-top:8px}
+.itr-tbl{width:100%;border-collapse:collapse;font-size:11px;min-width:480px}
+.itr-tbl th{background:var(--paper2);padding:7px 8px;font-size:9px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.04em;text-align:left;border-bottom:1px solid var(--paper3);white-space:nowrap}
+.itr-tbl td{padding:8px 8px;border-bottom:1px solid var(--paper2);vertical-align:middle}
+.itr-tbl tr:hover td{background:var(--paper2)}
+.itr-tbl tr.avg-row td{background:var(--paper2);font-weight:700;color:var(--teal)}
+.setup-wrap{flex:1;overflow-y:auto;padding:16px}
+.setup-step{background:var(--white);border:1px solid var(--paper3);border-radius:var(--r-lg);padding:18px;margin-bottom:14px;box-shadow:var(--sh)}
+.setup-step h3{font-size:16px;font-weight:600;margin-bottom:2px}
+.setup-step .ssub{font-size:11px;color:var(--ink3);margin-bottom:14px;line-height:1.5}
+.chip-wrap{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.chip{display:flex;align-items:center;gap:5px;padding:4px 9px 4px 7px;border-radius:99px;border:1px solid var(--paper3);background:var(--paper2);font-size:11px;font-weight:500}
+.chip-av{width:18px;height:18px;border-radius:50%;background:var(--teal4);color:var(--teal);display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:800}
+.chip-x{cursor:pointer;color:var(--ink3);font-size:14px;line-height:1;margin-left:1px}
+.chip-x:active{color:var(--red)}
+.add-row{display:flex;gap:6px}
+.cand-row{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--paper3);border-radius:var(--r-sm);background:var(--paper2);margin-bottom:6px}
+.cand-row-info{flex:1;min-width:0}
+.cand-row-name{font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cand-row-sub{font-size:10px;color:var(--ink3)}
+.cand-del{cursor:pointer;color:var(--ink4);font-size:18px;padding:4px;flex-shrink:0}
+.cand-del:active{color:var(--red)}
+.fi,.fs{width:100%;padding:9px 11px;border:1px solid var(--paper3);border-radius:var(--r-sm);font-family:inherit;font-size:13px;color:var(--ink);outline:none;transition:border .12s;background:var(--white)}
+.fi:focus,.fs:focus{border-color:var(--teal3)}
+.fi::placeholder{color:var(--ink4)}
+.btn{padding:9px 16px;border-radius:var(--r-sm);font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .15s;border:none;display:inline-flex;align-items:center;gap:5px}
+.btn-primary{background:var(--teal);color:#fff}
+.btn-primary:active{background:var(--teal2)}
+.btn-sec{background:var(--white);color:var(--ink2);border:1px solid var(--paper3)}
+.btn-sec:active{background:var(--paper2)}
+.btn-block{width:100%;justify-content:center;margin-top:6px}
+.conn-bar{display:flex;align-items:center;gap:8px;padding:7px 11px;border-radius:var(--r-sm);font-size:11px;border:1px solid transparent;margin-bottom:10px}
+.conn-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.cb-ok{background:var(--teal4);border-color:var(--teal3);color:var(--teal)}
+.cb-ok .conn-dot{background:var(--teal2)}
+.cb-err{background:var(--red4);border-color:var(--red3);color:var(--red)}
+.cb-err .conn-dot{background:var(--red2)}
+.cb-pending{background:var(--amber4);border-color:var(--amber3);color:var(--amber)}
+.cb-pending .conn-dot{background:var(--amber2)}
+.cb-idle{background:var(--paper3);color:var(--ink3)}
+.cb-idle .conn-dot{background:var(--ink4)}
+.login-wrap{flex:1;overflow-y:auto;display:flex;align-items:flex-start;justify-content:center;padding:20px 16px}
+.login-card{background:var(--white);border:1px solid var(--paper3);border-radius:var(--r-lg);padding:28px 22px;width:100%;max-width:400px;box-shadow:var(--sh-lg);text-align:center}
+.login-mark{width:52px;height:52px;background:var(--teal);border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;color:#fff;margin:0 auto 16px}
+.login-card h2{font-size:20px;font-weight:700;margin-bottom:4px}
+.login-card .lsub{font-size:12px;color:var(--ink3);margin-bottom:20px;line-height:1.5}
+.iwr-btn{width:100%;padding:11px 14px;border-radius:var(--r-sm);border:1px solid var(--paper3);background:var(--white);cursor:pointer;font-family:inherit;font-size:13px;font-weight:500;color:var(--ink);transition:all .15s;text-align:left;display:flex;align-items:center;gap:9px;margin-bottom:7px}
+.iwr-btn:active{background:var(--teal4);border-color:var(--teal3);color:var(--teal)}
+.iwr-btn.sel{background:var(--teal);color:#fff;border-color:var(--teal)}
+.iwr-av{width:32px;height:32px;border-radius:50%;background:var(--paper2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.iwr-btn.sel .iwr-av{background:rgba(255,255,255,.2);color:#fff}
+.login-divider{font-size:11px;color:var(--ink4);margin:12px 0 8px}
+.a-link{font-size:12px;color:var(--teal);cursor:pointer;text-decoration:underline}
+.con-pills{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.con-pill{font-size:11px;font-weight:600;padding:4px 10px;border-radius:99px}
+.con-hire{background:var(--teal4);color:var(--teal)}.con-hold{background:var(--amber4);color:var(--amber)}.con-decl{background:var(--red4);color:var(--red)}
+.sdiv{border:none;border-top:1px solid var(--paper3);margin:12px 0}
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:60vh;gap:10px;text-align:center;color:var(--ink3)}
+.empty-ico{font-size:42px;opacity:.25}
+.empty h3{font-size:15px;font-weight:600;color:var(--ink2)}
+.empty p{font-size:12px;max-width:240px;line-height:1.6}
+.float-bar{position:fixed;bottom:0;left:0;right:0;background:var(--white);border-top:1px solid var(--paper3);padding:10px 14px;display:none;gap:8px;z-index:30;box-shadow:0 -2px 12px rgba(0,0,0,.1)}
+@media(max-width:600px){.float-bar{display:flex}}
+.sec-title{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ink3);margin:14px 0 8px}
+.pdf-btn{display:flex;align-items:center;gap:6px;padding:9px 16px;border-radius:var(--r-sm);background:var(--teal);color:#fff;border:none;font-family:inherit;font-size:13px;font-weight:500;cursor:pointer;transition:background .15s;margin-bottom:12px;width:100%;justify-content:center}
+.pdf-btn:active{background:var(--teal2)}
+.spin{display:inline-block;width:12px;height:12px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite;vertical-align:middle}
+@keyframes sp{to{transform:rotate(360deg)}}
+.spin-teal{border-color:rgba(15,110,86,.2);border-top-color:var(--teal)}
+.hide{display:none!important}
+</style>
+</head>
+<body>
+
+<!-- SETUP -->
+<div id="screen-setup" class="screen">
+  <div class="topbar">
+    <div class="tb-mark">KC</div>
+    <div class="tb-titles"><div class="tb-title">KCPH Interview System</div><div class="tb-sub km">ប្រព័ន្ធសម្ភាសន៍ KCPH</div></div>
+    <div class="tb-actions">
+      <button class="tb-btn" onclick="testConn()">Test</button>
+      <button class="tb-btn tb-btn-white" onclick="launchSession()">Launch &rsaquo;</button>
+    </div>
+  </div>
+  <div class="setup-wrap">
+    <div class="setup-step">
+      <h3>0. Google Sheets <span class="km">/ ការភ្ជាប់</span></h3>
+      <p class="ssub">Paste the Apps Script URL. <span class="km">បញ្ចូល URL ដើម្បីធ្វើសមកាលកម្ម។</span></p>
+      <input class="fi" id="gas-url" type="url" placeholder="https://script.google.com/macros/s/…/exec" style="margin-bottom:8px">
+      <div style="display:flex;gap:6px;margin-bottom:8px">
+        <button class="btn btn-primary" style="flex:1" onclick="saveGasUrl()">Save &amp; Connect / រក្សាទុក</button>
+        <button class="btn btn-sec" onclick="testConn()">Test</button>
+      </div>
+      <div class="conn-bar cb-idle" id="conn-bar"><div class="conn-dot"></div><span id="conn-msg">Not connected / មិនបានភ្ជាប់</span></div>
+    </div>
+    <div class="setup-step">
+      <h3>1. Interviewers <span class="km">/ អ្នកសម្ភាស</span></h3>
+      <p class="ssub">Add panel members. <span class="km">បន្ថែមអ្នកសម្ភាស។</span></p>
+      <div class="chip-wrap" id="iwr-chips"></div>
+      <div class="add-row">
+        <input class="fi" id="iwr-inp" placeholder="Interviewer name / ឈ្មោះ" style="flex:1" onkeydown="if(event.key==='Enter')addIwr()">
+        <button class="btn btn-primary" onclick="addIwr()">Add</button>
+      </div>
+      <div id="iwr-msg" style="font-size:10px;color:var(--ink3);margin-top:6px"></div>
+    </div>
+    <div class="setup-step">
+      <h3>2. Candidates <span class="km">/ បេក្ខជន</span></h3>
+      <p class="ssub">Register all candidates. <span class="km">ចុះឈ្មោះបេក្ខជនទាំងអស់។</span></p>
+      <div id="cand-list-setup"></div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px">
+        <input class="fi" id="c-name" placeholder="Full name / ឈ្មោះពេញ" style="flex:2;min-width:130px">
+        <select class="fs" id="c-role" style="flex:1;min-width:110px" onchange="renderSetup()">
+          <option value="doctor">Medical Doctor / វេជ្ជបណ្ឌិត</option>
+          <option value="nurse">Reg. Nurse / គិលានុបដ្ឋាក</option>
+          <option value="receptionist">Receptionist / អ្នកទទួលភ្ញៀវ</option>
+          <option value="pro">Patient Relations Officer / មន្ត្រីទំនាក់ទំនង</option>
+        </select>
+        <input class="fi" id="c-id" placeholder="ID" style="flex:0 0 80px">
+        <button class="btn btn-primary" onclick="addCand()">Add</button>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;padding-bottom:20px">
+      <button class="btn btn-sec" style="flex:1" onclick="loadDemo()">Demo data</button>
+      <button class="btn btn-sec" style="flex:1" onclick="pullSheets()">&#8595; Pull Sheets</button>
+      <button class="btn btn-primary" style="flex:2" onclick="launchSession()">Launch Session &rsaquo;</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOGIN -->
+<div id="screen-login" class="screen">
+  <div class="topbar">
+    <div class="tb-mark">KC</div>
+    <div class="tb-titles"><div class="tb-title">KCPH Interview Scoring</div><div class="tb-sub">2026 Recruitment / ជ្រើសរើស ២០២៦</div></div>
+    <div class="tb-actions"><span class="a-link" style="color:rgba(255,255,255,.6);font-size:11px" onclick="goSetup()">Setup</span></div>
+  </div>
+  <div class="login-wrap">
+    <div class="login-card">
+      <div class="login-mark">KC</div>
+      <h2>Welcome / សូមស្វាគមន៍</h2>
+      <p class="lsub">Kampong Chhnang Provincial Hospital<br><span class="km">មន្ទីរពេទ្យខេត្តកំពង់ឆ្នាំង</span></p>
+      <div id="login-sync-msg" style="margin-bottom:10px"></div>
+      <p style="font-size:11px;font-weight:600;text-align:left;margin-bottom:8px;color:var(--ink2)">Select your name / ជ្រើសឈ្មោះរបស់អ្នក</p>
+      <div id="login-iwr-list"></div>
+      <button class="btn btn-primary btn-block" onclick="loginIwr()">Enter / ចូល &rsaquo;</button>
+      <div class="login-divider">&mdash; or / ឬ &mdash;</div>
+      <span class="a-link" onclick="goSetup()">Admin Setup</span> &nbsp;|&nbsp;
+      <span class="a-link" onclick="goResults()">Results Panel / លទ្ធផល</span>
+    </div>
+  </div>
+</div>
+
+<!-- SCORING -->
+<div id="screen-scoring" class="screen">
+  <div class="topbar">
+    <button class="ham-btn" onclick="toggleSidebar()" aria-label="Menu"><span></span><span></span><span></span></button>
+    <div class="tb-mark">KC</div>
+    <div class="tb-titles"><div class="tb-title">Score Sheet / វាយតម្លៃ</div><div class="tb-sub"><span id="sc-iwr-label"></span></div></div>
+    <div class="tb-actions">
+      <span class="sync-dot" id="sc-sync-dot">Offline</span>
+      <button class="tb-btn tb-btn-teal" onclick="syncNow('sc')" id="btn-sync-sc">Sync</button>
+      <button class="tb-btn" onclick="goLogin()">&#8592;</button>
+    </div>
+  </div>
+  <div class="sidebar-overlay" id="sc-overlay" onclick="closeSidebar()"></div>
+  <div class="app-body">
+    <div class="sidebar" id="sc-sidebar">
+      <div class="sb-sect"><div class="sb-lbl">Candidates / <span class="km">បេក្ខជន</span></div></div>
+      <div class="sb-list" id="sc-cand-list"></div>
+      <div class="sb-footer">
+        <div class="sb-stat"><span>Scored / វាយតម្លៃ</span><strong id="sc-stat-scored">0</strong></div>
+        <div class="sb-stat"><span>Total / សរុប</span><strong id="sc-stat-total">0</strong></div>
+      </div>
+    </div>
+    <div class="main" id="sc-main">
+      <div class="empty" id="sc-empty"><div class="empty-ico">&#128203;</div><h3>Select a candidate</h3><p class="km">ជ្រើសរើសបេក្ខជនពី sidebar ដើម្បីចាប់ផ្ដើម</p></div>
+      <div id="sc-sheet" style="display:none"></div>
+    </div>
+  </div>
+  <div class="float-bar">
+    <button class="btn btn-sec" style="flex:1" onclick="toggleSidebar()">&#9776; Candidates</button>
+    <button class="btn btn-primary" style="flex:1" onclick="syncNow('sc')">&#8593; Sync</button>
+    <button class="btn btn-sec" onclick="goResults()">Results &#8594;</button>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div id="screen-results" class="screen">
+  <div class="topbar">
+    <button class="ham-btn" onclick="toggleResultsSidebar()" aria-label="Menu"><span></span><span></span><span></span></button>
+    <div class="tb-mark">KC</div>
+    <div class="tb-titles"><div class="tb-title">Results / លទ្ធផល</div><div class="tb-sub">Aggregated scores / ពិន្ទុសរុប</div></div>
+    <div class="tb-actions">
+      <span class="sync-dot" id="res-sync-dot">Offline</span>
+      <button class="tb-btn tb-btn-teal" onclick="syncNow('res')" id="btn-sync-res">&#8593;</button>
+      <button class="tb-btn" onclick="pullSheets()" id="btn-pull">&#8595;</button>
+      <button class="tb-btn" onclick="goLogin()">Login</button>
+    </div>
+  </div>
+  <div class="sidebar-overlay" id="res-overlay" onclick="closeResultsSidebar()"></div>
+  <div class="app-body">
+    <div class="sidebar" id="res-sidebar">
+      <div class="sb-sect"><div class="sb-lbl">Candidates / <span class="km">បេក្ខជន</span></div></div>
+      <div class="sb-list" id="res-cand-list"></div>
+      <div class="sb-footer">
+        <div class="sb-stat"><span>Doctors</span><strong id="res-doc">-</strong></div>
+        <div class="sb-stat"><span>Nurses</span><strong id="res-nur">-</strong></div>
+        <div class="sb-stat"><span>Interviewers</span><strong id="res-iwr">-</strong></div>
+      </div>
+    </div>
+    <div class="main" id="res-main">
+      <div class="empty" id="res-empty"><div class="empty-ico">&#128202;</div><h3>Select a candidate / ជ្រើសរើសបេក្ខជន</h3><p class="km">ចុចឈ្មោះបេក្ខជនដើម្បីមើលពិន្ទុសរុប</p></div>
+      <div id="res-sheet" style="display:none"></div>
+    </div>
+  </div>
+  <div class="float-bar">
+    <button class="btn btn-sec" style="flex:1" onclick="toggleResultsSidebar()">&#9776; List</button>
+    <button class="btn btn-sec" style="flex:1" onclick="pullSheets()">&#8595; Pull</button>
+    <button class="btn btn-primary" style="flex:1" onclick="syncNow('res')">&#8593; Push</button>
+  </div>
+</div>
+<script>
+
+/* CATEGORIES — CLINICAL */
+const CATS=[
+  {id:'general',en:'General & Personal',km:'ទូទៅ និងផ្ទាល់ខ្លួន',ico:'👤',bg:'#E1F5EE',w:10,
+   q:{doctor:{en:"Why did you choose Kampong Chhnang Provincial Hospital, and where do you see yourself professionally in the next three to five years?",km:"ហេតុអ្វីបានជាអ្នកជ្រើសរើសមន្ទីរពេទ្យខេត្តកំពង់ឆ្នាំង ហើយតើអ្នកមើលឃើញខ្លួនឯងស្ថិតក្នុងស្ថានភាពបែបណាក្នុងវិជ្ជាជីវៈក្នុងរយៈពេលបីទៅប្រាំឆ្នាំខាងមុខ?"},
+       nurse:{en:"Why did you choose Kampong Chhnang Provincial Hospital, and where do you see yourself professionally in the next three to five years?",km:"ហេតុអ្វីបានជាអ្នកជ្រើសរើសមន្ទីរពេទ្យខេត្តកំពង់ឆ្នាំង ហើយតើអ្នកមើលឃើញខ្លួនឯងស្ថិតក្នុងស្ថានភាពបែបណាក្នុងវិជ្ជាជីវៈក្នុងរយៈពេលបីទៅប្រាំឆ្នាំខាងមុខ?"}},
+   rubric:{en:['No clear motivation','Vague; limited reflection','Adequate motivation','Clear motivation; aligned with mission','Exceptional insight; strong commitment'],
+           km:['គ្មានការលើកទឹកចិត្ត','មិនច្បាស់','ការលើកទឹកចិត្តគ្រប់គ្រាន់','ការលើកទឹកចិត្តច្បាស់','ឆ្លុះបញ្ចាំងល្អ']}},
+  {id:'clinical',en:'Clinical Competency',km:'សមត្ថភាពគ្លីនិក',ico:'🩺',bg:'#E6F1FB',w:25,
+   q:{doctor:{en:"A 45-year-old presents with chest pain, diaphoresis, and shortness of breath. Walk through your immediate assessment and management in our resource-limited setting.",km:"បុរសអាយុ ៤៥ ឆ្នាំម្នាក់មានអាការៈឈឺទ្រូង បែកញើសស្អិត និងដង្ហើមខ្លីៗ។ សូមពន្យល់អំពីការវាយតម្លៃ និងការគ្រប់គ្រងភ្លាមៗរបស់អ្នកនៅក្នុងបរិបទដែលមានធនធានមានកំណត់របស់យើង។"},
+       nurse:{en:"Describe the five rights of medication administration and explain how you verify each one before giving any drug.",km:"សូមពិពណ៌នាអំពី 5 Rights នៃការចាក់ថ្នាំ ហើយពន្យល់ពីរបៀបដែលអ្នកផ្ទៀងផ្ទាត់ Right នីមួយៗមុនពេលផ្តល់ថ្នាំណាមួយ។"}},
+   rubric:{en:['Dangerous gaps; unsafe','Incomplete; significant errors','Adequate; generally safe','Good; structured; systematic','Excellent; references local guidelines'],
+           km:['គ្រោះថ្នាក់','មិនពេញលេញ','គ្រប់គ្រាន់','ល្អ; ប្រព័ន្ធ','ល្អឥតខ្ចោះ']}},
+  {id:'ipc',en:'IPC & Patient Safety',km:'ការការពារការឆ្លងរោគ',ico:'🛡',bg:'#FAEEDA',w:20,
+   q:{doctor:{en:"What strategies prevent surgical site infections peri-operatively? How do you respond immediately after a needlestick injury?",km:"តើ​មាន​យុទ្ធសាស្ត្រ​អ្វីខ្លះ​ដើម្បី​ការពារ​ការ​ក្លាយរោគមុខរបួស​វះកាត់​ជុំវិញពេល​វះកាត់? តើ​អ្នក​ឆ្លើយតប​ភ្លាមៗ​យ៉ាង​ដូចម្តេច​បន្ទាប់​ពី​របួស​ដោយសារ​ម្ជុល?"},
+       nurse:{en:"Describe the WHO 5 moments for hand hygiene. When is soap and water required over hand rub? How is medical waste segregated in Cambodia?",km:"សូមពិពណ៌នាអំពីពេលវេលាទាំង ៥ សម្រាប់អនាម័យដៃរបស់អង្គការសុខភាពពិភពលោក (WHO)។ តើពេលណាដែលតម្រូវឱ្យប្រើសាប៊ូ និងទឹក? តើកាកសំណល់វេជ្ជសាស្ត្រត្រូវបានញែក ចេញពីគ្នាយ៉ាងដូចម្តេចនៅក្នុងប្រទេសកម្ពុជា?"}},
+   rubric:{en:['No IPC awareness','Partial; misses key moments','Acceptable; covers basics','Good; WHO moments correct','Comprehensive; references guidelines'],
+           km:['គ្មានការយល់ដឹង IPC','ដឹងតែខ្លះ','គ្រប់គ្រាន់','ល្អ','ពេញលេញ']}},
+  {id:'ethics',en:'Ethics & Conduct',km:'សីលធម៌ វិជ្ជាជីវៈ',ico:'⚖',bg:'#EEEDFE',w:15,
+   q:{doctor:{en:"A family offers money for better care. How do you respond? Describe how you obtain informed consent from a patient with low literacy.",km:"គ្រួសារមួយផ្តល់ប្រាក់សម្រាប់ការថែទាំកាន់តែប្រសើរ។ តើអ្នកឆ្លើយតបយ៉ាងដូចម្តេច? សូមពិពណ៌នាអំពីរបៀបដែលអ្នកទទួលបានការយល់ព្រមពីអ្នកជំងឺដែលមានអក្ខរកម្មទាប។"},
+       nurse:{en:"A senior colleague skips hand hygiene before a procedure, then speaks disrespectfully to a patient. How do you respond to each situation?",km:"រាមច្បងម្នាក់រំលងការសម្អាតដៃមុនពេលធ្វើនីតិវិធី បន្ទាប់មកនិយាយដោយមិនគោរព អ្នកជំងឺ។ តើអ្នកឆ្លើយតបទៅនឹងស្ថានភាពនីមួយៗយ៉ាងដូចម្តេច?"}},
+   rubric:{en:['Unethical; would not escalate','Hesitant; avoids difficult situations','Declines gift; reports but lacks confidence','Clear ethical stance; professional escalation','Exemplary; cites patient rights'],
+           km:['ខុសសីលធម៌','ស្ទើរស្ទាំ','បដិសេធ; រាយការណ៍ប៉ុន្តែខ្សោយ','ជំហររឹងមាំ','ល្អបំផុត']}},
+  {id:'admin',en:'Administrative Awareness',km:'ការយល់ដឹងរដ្ឋបាល',ico:'📋',bg:'#F1EFE8',w:10,
+   q:{doctor:{en:"What do you understand about CHAS accreditation? How do you ensure accurate clinical documentation in the national HIS?",km:"តើអ្នកយល់យ៉ាងណាចំពោះការទទួលស្គាល់ CHAS (ស្តង់ដារទទួលស្គាល់មន្ទីរពេទ្យកម្ពុជា)? តើអ្នកធានាឯកសារគ្លីនិកត្រឹមត្រូវនៅក្នុងប្រព័ន្ធព័ត៌មានសុខភាពជាតិ (HIS) យ៉ាងដូចម្តេច?"},
+       nurse:{en:"What do you understand about hospital accreditation? How do you document adverse events or near-misses?",km:"តើអ្នកយល់យ៉ាងណាចំពោះការទទួលស្គាល់គុណភាពមន្ទីរពេទ្យ? តើអ្នកកត់ត្រាព្រឹត្តិការណ៍មិនល្អ ឬកំហុសស្ទើរតែកើតឡើងដោយរបៀបណា?"}},
+   rubric:{en:['No accreditation awareness','Minimal; poor documentation','Basic; inconsistent','Good CHAS awareness; systematic','Excellent; proactive QI mindset'],
+           km:['គ្មានការយល់ដឹង','តិចតួច','មូលដ្ឋាន','CHAS ល្អ','ល្អឥតខ្ចោះ']}},
+  {id:'emergency',en:'Emergency Scenario',km:'សេណារីយ៉ូសង្គ្រោះបន្ទាន់',ico:'🚨',bg:'#FCEBEB',w:15,
+   q:{doctor:{en:"Three critically ill patients arrive simultaneously: cardiac arrest, severe respiratory distress, and major trauma. How do you triage and respond?",km:"អ្នកជំងឺដែលមានជំងឺធ្ងន់ធ្ងរបីនាក់បានមកដល់ក្នុងពេលដំណាលគ្នា៖ គាំងបេះដូង ពិបាកដកដង្ហើមធ្ងន់ធ្ងរ និងរបួសធ្ងន់ធ្ងរ។ តើអ្នកធ្វើរោគវិនិច្ឆ័យ និងឆ្លើយតបយ៉ាងដូចម្តេច?"},
+       nurse:{en:"You find a patient unresponsive in the ward. Walk through every step you take from the moment you discover them.",km:"អ្នកឃើញអ្នកជំងឺម្នាក់គ្មានការឆ្លើយតបអ្វីនៅក្នុងសាល។ សូមរៀបរាប់ជំហាននីមួយៗដែលអ្នកនឹងអនុវត្តចាប់ពីពេលដែលអ្នកបានឃើញគាត់។"}},
+   rubric:{en:['Wrong sequence; patient at risk','Some correct steps but disordered','Adequate; calls for help; basic BLS correct','Systematic; correct triage; delegates well','Outstanding; calm; activates team efficiently'],
+           km:['លំដាប់ខុស','ជំហានខ្លះត្រឹមត្រូវ','គ្រប់គ្រាន់; BLS មូលដ្ឋាន','ប្រព័ន្ធ; triage ត្រឹមត្រូវ','ល្អឥតខ្ចោះ']}},
+  {id:'situational',en:'Situational Judgment',km:'ការវិនិច្ឆ័យតាមស្ថានភាព',ico:'🧠',bg:'#E1F5EE',w:5,
+   q:{doctor:{en:"You disagree with a clinical decision by the head of department that may harm the patient. How do you express your concern while respecting hierarchy?",km:"អ្នកមិនយល់ស្របនឹងការសម្រេចចិត្តផ្នែកគ្លីនិករបស់ប្រធានផ្នែកដែលអាចប៉ះពាល់ដល់អ្នកជំងឺនោះទេ។ តើអ្នកបង្ហាញការព្រួយបារម្ភរបស់អ្នកយ៉ាងដូចម្តេច ខណៈពេលដែលគោរព ឋានានុក្រម?"},
+       nurse:{en:"An angry patient family is shouting at nursing staff in the ward corridor. You are the nurse on duty. How do you de-escalate?",km:"គ្រួសារអ្នកជំងឺដែលមានកំហឹងកំពុងស្រែកដាក់បុគ្គលិកពេទ្យនៅខាងក្រៅសាល។ អ្នកគឺជាគិលានុបដ្ឋាយិកាដែលកំពុងបំពេញការងារ។ តើអ្នកធ្វើដូចម្តេចដើម្បីបន្ធូរបន្ថយស្ថានការណ៍?"}},
+   rubric:{en:['Avoids conflict entirely','Hesitant; poor communication','Addresses situation; lacks confidence','Professional; calm; appropriate channels','Exceptional; assertive yet respectful'],
+           km:['ជៀសវាងទំនាស់','ស្ទើរ','ដោះស្រាយប៉ុន្តែខ្វះទំនុកចិត្ត','វិជ្ជាជីវៈ; ស្ងប់ស្ងាត់','ល្អឥតខ្ចោះ']}}
+];
+
+/* CATEGORIES — CUSTOMER SERVICE */
+const CATS_CS=[
+  {id:'cs_personal',en:'Personal & Motivation',km:'ផ្ទាល់ខ្លួន និងការលើកទឹកចិត្ត',ico:'😊',bg:'#E1F5EE',w:10,
+   q:{receptionist:{en:"Why do you want to work as a receptionist at Kampong Chhnang Provincial Hospital? What qualities do you have that make you suitable for a patient-facing role at a government hospital?",km:"ហេតុអ្វីបានជាអ្នកចង់ធ្វើការជាអ្នកទទួលភ្ញៀវនៅមន្ទីរពេទ្យខេត្តកំពង់ឆ្នាំង? តើអ្នកមានគុណភាពអ្វីខ្លះដែលធ្វើឲ្យអ្នកស័ក្តិសមសម្រាប់តួនាទីដែលប្រឈមមុខជាមួយអ្នកជំងឺនៅមន្ទីរពេទ្យរដ្ឋ?"},
+       pro:{en:"Why do you want to work in patient relations at KCPH? Describe a time when you successfully resolved a difficult complaint or conflict with a member of the public.",km:"ហេតុអ្វីបានជាអ្នកចង់ធ្វើការទំនាក់ទំនងអ្នកជំងឺនៅ KCPH? ពណ៌នាករណីមួយដែលអ្នកបានដោះស្រាយការត្អូញត្អែរ ឬជម្លោះដ៏លំបាកម្នាក់ជាមួយសាធារណជនបានជោគជ័យ។"}},
+   rubric:{en:['No motivation; no relevant experience','Vague motivation; limited experience','Adequate motivation; some experience','Clear motivation; solid background','Exceptional drive; extensive experience'],
+           km:['គ្មានការលើកទឹកចិត្ត','ការលើកទឹកចិត្តមិនច្បាស់','ការលើកទឹកចិត្តគ្រប់គ្រាន់','ការលើកទឹកចិត្តច្បាស់','ឧត្ដម']}},
+  {id:'cs_communication',en:'Communication Skills',km:'ជំនាញទំនាក់ទំនង',ico:'💬',bg:'#E6F1FB',w:20,
+   q:{receptionist:{en:"A patient arrives at the reception desk who speaks only Khmer and appears very anxious. They cannot find the right words to explain why they are here. How do you communicate with them and direct them to the correct department?",km:"អ្នកជំងឺម្នាក់មកដល់នៅ reception desk ដែលនិយាយតែភាសាខ្មែរ ហើយមើលទៅព្រួយបារម្ភខ្លាំងណាស់។ ពួកគេមិនអាចរកពាក្យត្រឹមត្រូវដើម្បីពន្យល់ថាហេតុអ្វីបានជាពួកគេមកនៅទីនេះ។ តើអ្នកទំនាក់ទំនងជាមួយពួកគេ ហើយណែនាំពួកគេទៅផ្នែកត្រឹមត្រូវ?"},
+       pro:{en:"A patient's family is demanding to know why their relative has been waiting for two hours to see a doctor. They are raising their voice at the front desk. How do you explain the situation calmly and professionally without breaching confidentiality?",km:"ក្រុមគ្រួសាររបស់អ្នកជំងឺម្នាក់ទាមទារចង់ដឹងថា ហេតុអ្វីបានជាញាតិរបស់ពួកគេត្រូវរង់ចាំពីរម៉ោងដើម្បីជួបគ្រូពេទ្យ។ ពួកគេបង្ហើបទៅ front desk។ តើអ្នកពន្យល់ស្ថានភាពដោយស្ងប់ស្ងាត់ និងវិជ្ជាជីវៈ ដោយមិនបំពានភាពសម្ងាត់ថែម?"}},
+   rubric:{en:['Cannot communicate clearly','Struggles under pressure','Communicates adequately','Clear; warm; professional','Outstanding; empathetic; adapts tone'],
+           km:['មិនអាចទំនាក់ទំនង','ស្ទើរ','ទំនាក់ទំនងគ្រប់គ្រាន់','ច្បាស់ ក្ដៅ វិជ្ជាជីវៈ','ឧត្ដម']}},
+  {id:'cs_patienthandling',en:'Patient Handling & Empathy',km:'ការគ្រប់គ្រងអ្នកជំងឺ',ico:'🤝',bg:'#FAEEDA',w:20,
+   q:{receptionist:{en:"An elderly patient arrives alone at the hospital. They appear confused, cannot find the OPD registration counter, and are about to leave. What steps do you take from the moment you notice them, and how do you ensure they receive the help they need?",km:"អ្នកជំងឺចំណាស់ម្នាក់មកដល់មន្ទីរពេទ្យម្នាក់ឯង។ ពួកគេមើលទៅច្របូកច្របល់ មិនអាចរកស្ថានីយ OPD ហើយជិតចាកចេញ។ តើអ្នកអនុវត្តជំហានអ្វីខ្លះចាប់ពីពេលអ្នកកត់សម្គាល់ ហើយតើអ្នកធ្វើយ៉ាងណាដើម្បីធានាថាពួកគេទទួលបានជំនួយដែលពួកគេត្រូវការ?"},
+       pro:{en:"A patient's family member confronts you aggressively, accusing the hospital of neglecting their relative. They are creating a scene in the main lobby. How do you de-escalate the situation, protect the dignity of all parties, and manage the complaint appropriately?",km:"សមាជិកគ្រួសាររបស់អ្នកជំងឺម្នាក់ប្រឈមមុខជាមួយអ្នកដោយការឈ្លានពាន ចោទប្រកាន់មន្ទីរពេទ្យថាធ្វេសប្រហែសញាតិរបស់ពួកគេ។ ពួកគេកំពុងបង្ករឿងនៅ lobby ។ តើអ្នកបន្ថយភាពតានតឹង ការពារសេចក្តីថ្លៃថ្នូររបស់ភាគីទាំងអស់ ហើយគ្រប់គ្រងការត្អូញត្អែរឲ្យបានត្រឹមត្រូវ?"}},
+   rubric:{en:['No empathy; dismissive','Minimal empathy; mechanical','Shows basic care','Warm and patient-centred','Exemplary empathy; proactive'],
+           km:['គ្មានការយោគយល់','ការយោគយល់តិច','បង្ហាញការយកចិត្ត','ក្ដៅ ផ្ដោតលើអ្នកជំងឺ','ឧត្ដម']}},
+  {id:'cs_procedure',en:'Hospital Procedures & Knowledge',km:'នីតិវិធី និងចំណេះដឹង',ico:'📋',bg:'#EEEDFE',w:20,
+   q:{receptionist:{en:"Walk us through the full process of registering a new outpatient at KCPH — from the moment they arrive to the point they are directed to the correct clinic. What documents do you check? How do you handle patients who arrive without an ID or referral letter?",km:"ពន្យល់ដំណើរការពេញលេញនៃការចុះឈ្មោះអ្នកជំងឺក្រៅថ្មីម្នាក់នៅ KCPH ចាប់ពីពេលពួកគេមកដល់ រហូតដល់ពួកគេត្រូវបានណែនាំទៅគ្លីនិកត្រឹមត្រូវ។ តើអ្នកពិនិត្យឯកសារអ្វីខ្លះ? ហើយតើអ្នកដោះស្រាយអ្នកជំងឺដែលមកដោយគ្មានអត្តសញ្ញាណប័ណ្ណ ឬលិខិតបញ្ជូន?"},
+       pro:{en:"A patient's family asks whether their relative qualifies for the Health Equity Fund (HEF). They are clearly from a low-income background but do not have documentation with them. Explain the HEF eligibility criteria and describe how you would guide this family through the process.",km:"ក្រុមគ្រួសាររបស់អ្នកជំងឺម្នាក់សួរថា ញាតិរបស់ពួកគេបំពេញលក្ខខណ្ឌសម្រាប់មូលនិធិសមធម៌សុខភាព (HEF) ឬអត់។ ពួកគេច្បាស់ជាមកពីគ្រួសារក្រីក្រ ប៉ុន្តែគ្មានឯកសារជាមួយ។ ពន្យល់លក្ខណ្ឌណែនាំសម្រាប់ HEF ហើយពណ៌នាពីរបៀបដែលអ្នកណែនាំគ្រួសារនេះតាមដំណើរការ។"}},
+   rubric:{en:['No knowledge of procedures','Limited; cannot guide','Knows basic process','Good knowledge; guides correctly','Comprehensive; references HEF'],
+           km:['គ្មានចំណេះដឹង','មានកម្រិត','ដឹងដំណើរការ','ចំណេះដឹងល្អ','ពេញលេញ']}},
+  {id:'cs_teamwork',en:'Teamwork & Adaptability',km:'ការងារជាក្រុម',ico:'👥',bg:'#E1F5EE',w:10,
+   q:{receptionist:{en:"It is peak hours at the OPD and the queue is very long. Your only colleague at the registration desk has just called in sick. Two patients are arguing about queue position, a phone is ringing unanswered, and three new walk-in patients are waiting to register. How do you manage this situation?",km:"ជាពេលម៉ោងមមាញឹកនៅ OPD ហើយជួររង់ចាំវែងណាស់។ ដៃគូរបស់អ្នកតែម្នាក់គ្នា registration desk ទើបទូរស័ព្ទជំងឺ។ អ្នកជំងឺពីរនាក់ចោទជ្រើររឿងលំដាប់ជួរ ទូរស័ព្ទរោទ់ដោយគ្មានអ្នកទទួល ហើយអ្នកជំងឺថ្មីបីនាក់ទៀតកំពុងរង់ចាំចុះឈ្មោះ។ តើអ្នកគ្រប់គ្រងស្ថានភាពនេះ?"},
+       pro:{en:"A nurse from the ward contacts you because a patient's family is threatening to file a formal complaint against the hospital. The family is demanding an immediate response from hospital management. How do you coordinate between the family, nursing staff, and hospital administration to resolve this?",km:"គិលានុបដ្ឋាយិកាម្នាក់ពី ward ទំនាក់ទំនងអ្នកដោយសារក្រុមគ្រួសាររបស់អ្នកជំងឺម្នាក់គំរាមដាក់ពាក្យបណ្ដឹងផ្លូវការប្រឆាំងនឹងមន្ទីរពេទ្យ។ ក្រុមគ្រួសារទាមទារការឆ្លើយតបភ្លាមៗពីការគ្រប់គ្រងមន្ទីរពេទ្យ។ តើអ្នកសម្របសម្រួលរវាងក្រុមគ្រួសារ គិលានុបដ្ឋាយិកា និងការគ្រប់គ្រងមន្ទីរពេទ្យ?"}},
+   rubric:{en:['Cannot adapt; struggles','Rigid; limited teamwork','Manages adequately','Flexible; proactive team player','Highly adaptable; leads team'],
+           km:['មិនអាចសម្របខ្លួន','ភាពឋិតរឹង','គ្រប់គ្រានគ្រប់គ្រាន់','បត់បែន','សម្របខ្លួនបានល្អ']}},
+  {id:'cs_confidentiality',en:'Privacy & Confidentiality',km:'ឯកជនភាព និងការសម្ងាត់',ico:'🔒',bg:'#FCEBEB',w:10,
+   q:{receptionist:{en:"While working at the front desk, a person approaches claiming to be the patient's employer and asks for information about the patient's diagnosis and current ward location. The patient has not given any written consent for information to be shared. How do you respond?",km:"ខណៈពេលធ្វើការនៅ front desk មានអ្នកម្នាក់ចូលមកអះអាងថាជានិយោជករបស់អ្នកជំងឺ ហើយសួររកព័ត៌មានអំពីការធ្វើរោគវិនិច្ឆ័យ និងទីតាំង ward បច្ចុប្បន្ន។ អ្នកជំងឺមិនបានផ្តល់ការយល់ព្រមជាលាយលក្ខណ៍អក្សរណាមួយ។ តើអ្នកឆ្លើយតប?"},
+       pro:{en:"You notice that a colleague at the reception desk is discussing a patient's medical condition loudly on the phone in a public area where other patients can overhear. The colleague does not seem aware of the problem. What do you do, and how do you prevent this from happening again?",km:"អ្នកកត់សម្គាល់ថាមិត្តរួមការងារម្នាក់នៅ reception desk កំពុងពិភាក្សាអំពីស្ថានភាពវេជ្ជសាស្ត្ររបស់អ្នកជំងឺដោយឮៗតាមទូរស័ព្ទនៅក្នុងតំបន់សាធារណៈ ដែលអ្នកជំងឺផ្សេងទៀតអាចឮ។ ដៃគូមិនដឹងថានេះជាបញ្ហា។ តើអ្នកធ្វើអ្វី ហើយតើអ្នករារាំងបញ្ហានេះកុំឲ្យកើតឡើងម្ដងទៀតយ៉ាងដូចម្ដេច?"}},
+   rubric:{en:['Discloses without hesitation','Unsure; does not know policy','Declines but cannot explain','Refuses correctly; cites privacy','Excellent; educates and escalates'],
+           km:['ផ្ដល់ព័ត៌មានភ្លាម','មិនប្រាកដ','បដិសេធប៉ុន្តែពន្យល់មិនច្បាស់','បដិសេធត្រឹមត្រូវ','ឧត្ដម']}},
+  {id:'cs_stress',en:'Stress Management & Professionalism',km:'ការគ្រប់គ្រងភាពតានតឹង',ico:'🧘',bg:'#F1EFE8',w:10,
+   q:{receptionist:{en:"A patient has been waiting for over three hours and is becoming increasingly angry. They begin shouting at you, accusing you of ignoring them and providing poor service. Other patients in the waiting area are watching. How do you handle this situation professionally while maintaining the dignity of everyone present?",km:"អ្នកជំងឺម្នាក់បានរង់ចាំជាងបីម៉ោង ហើយកំពុងខឹងខ្លាំងឡើង។ ពួកគេចាប់ផ្តើមស្រែកដាក់អ្នក ចោទប្រកាន់ថាអ្នកធ្វេសប្រហែស ហើយផ្តល់សេវាកម្មអន់ថយ។ អ្នកជំងឺផ្សេងទៀតនៅក្នុងតំបន់រង់ចាំកំពុងមើល។ តើអ្នកដោះស្រាយស្ថានភាពនេះដោយវិជ្ជាជីវៈ ខណៈរក្សាការគោរពសេចក្ដីថ្លៃថ្នូររបស់គ្រប់គ្នា?"},
+       pro:{en:"On a particularly busy clinic day, you receive five patient complaints simultaneously — two about long waiting times, one about a billing dispute, one about a lost document, and one about rude treatment by a staff member. You must handle all five without any support from a supervisor. How do you prioritise and manage each one?",km:"នៅថ្ងៃគ្លីនិកមមាញឹកជាពិសេស អ្នកទទួលបានការត្អូញត្អែររបស់អ្នកជំងឺចំនួនប្រាំក្នុងពេលតែមួយ — ពីររឿងការរង់ចាំយូរ មួយរឿងជម្លោះវិក្កយបត្រ មួយរឿងបាត់ឯកសារ ហើយមួយទៀតរឿងបុគ្គលិករបស់សម្ដែងគួបគ្មានអធ្យាស្រ័យ។ អ្នកត្រូវដោះស្រាយទាំងប្រាំដោយគ្មានការគាំទ្រពីអ្នកគ្រប់គ្រង។ តើអ្នកកំណត់អាទិភាព ហើយគ្រប់គ្រងម្នាក់ៗ?"}},
+   rubric:{en:['Reacts aggressively or shuts down','Becomes flustered; cannot compose','Calm but lacks strategy','Calm; professional; de-escalates','Exemplary; turns situation positive'],
+           km:['មានប្រតិកម្មខឹង','ភ័យស្ទើរ','ស្ងប់ប៉ុន្តែខ្វះយុទ្ធសាស្ត្រ','ស្ងប់ វិជ្ជាជីវៈ','ឧត្ដម']}}
+];
+
+function getCatsForRole(role){
+  return (role==='receptionist'||role==='pro') ? CATS_CS : CATS;
+}
+
+/* STATE */
+const GAS_URL_DEFAULT='https://script.google.com/macros/s/AKfycbzYiViYEEPP0NZToqzpfPOWaVihhXjqps_Q2RYS2SdWWeueImTt_973yGMrUhXvl5Fomw/exec';
+let S={gasUrl:GAS_URL_DEFAULT,interviewers:[],candidates:[],scores:{},notes:{},recs:{},recNotes:{},sessionOpen:false};
+let currentIwr=null,currentCandScore=null,currentCandResults=null,loginSel=null;
+
+function saveLocal(){localStorage.setItem('kcph_v4',JSON.stringify(S));}
+function loadLocal(){
+  const d=localStorage.getItem('kcph_v4');
+  if(d)try{S=JSON.parse(d);}catch(e){}
+  if(GAS_URL_DEFAULT&&GAS_URL_DEFAULT.startsWith('http'))S.gasUrl=GAS_URL_DEFAULT;
+}
+loadLocal();
+
+/* HELPERS */
+function initials(n){return(n||'?').split(' ').slice(0,2).map(w=>w[0]||'').join('').toUpperCase()||'?';}
+function roleLabel(r){const m={doctor:'Medical Doctor',nurse:'Reg. Nurse',receptionist:'Receptionist',pro:'Patient Relations'};return m[r]||r;}
+function roleAv(r){const m={doctor:'av-doc',nurse:'av-nur',receptionist:'av-rec',pro:'av-pro'};return m[r]||'av-nur';}
+function rolePill(r){const m={doctor:'rp-doc',nurse:'rp-nur',receptionist:'rp-rec',pro:'rp-pro'};return m[r]||'rp-nur';}
+function roleCode(r){const m={doctor:'MD',nurse:'RN',receptionist:'RC',pro:'PR'};return m[r]||r;}
+function pctClass(p){if(!p)return'p-na';if(p<50)return'p-lo';if(p<70)return'p-mid';return'p-hi';}
+function getScore(cid,iid,cat){return(S.scores[cid]&&S.scores[cid][iid]&&S.scores[cid][iid][cat])||0;}
+function setScore(cid,iid,cat,v){if(!S.scores[cid])S.scores[cid]={};if(!S.scores[cid][iid])S.scores[cid][iid]={};S.scores[cid][iid][cat]=v;saveLocal();}
+function getNote(cid,iid,cat){return(S.notes[cid]&&S.notes[cid][iid]&&S.notes[cid][iid][cat])||'';}
+function setNote(cid,iid,cat,v){if(!S.notes[cid])S.notes[cid]={};if(!S.notes[cid][iid])S.notes[cid][iid]={};S.notes[cid][iid][cat]=v;saveLocal();}
+function getRec(cid,iid){return(S.recs[cid]&&S.recs[cid][iid])||'';}
+function setRecLocal(cid,iid,v){if(!S.recs[cid])S.recs[cid]={};S.recs[cid][iid]=v;saveLocal();}
+function getRecNote(cid,iid){return(S.recNotes[cid]&&S.recNotes[cid][iid])||'';}
+function setRecNoteLocal(cid,iid,v){if(!S.recNotes[cid])S.recNotes[cid]={};S.recNotes[cid][iid]=v;saveLocal();}
+
+function calcIwrScore(cid,iid){
+  const c=S.candidates.find(x=>x.id===cid);
+  const cats=c?getCatsForRole(c.role):CATS;
+  let total=0,answered=0;
+  cats.forEach(cat=>{const s=getScore(cid,iid,cat.id);if(s>0){total+=s*cat.w;answered++;}});
+  return{total,answered,pct:Math.round(total/5)};
+}
+function calcAvgScore(cid){
+  const c=S.candidates.find(x=>x.id===cid);
+  const cats=c?getCatsForRole(c.role):CATS;
+  const catAvgs={};
+  cats.forEach(cat=>{let sum=0,n=0;S.interviewers.forEach(iwr=>{const s=getScore(cid,iwr.id,cat.id);if(s>0){sum+=s;n++;}});catAvgs[cat.id]=n>0?sum/n:0;});
+  let ws=0,wt=0;
+  cats.forEach(cat=>{if(catAvgs[cat.id]>0){ws+=catAvgs[cat.id]*cat.w;wt+=5*cat.w;}});
+  const pct=wt>0?Math.round(ws/wt*100):0;
+  const scoredBy=S.interviewers.filter(iwr=>cats.some(cat=>getScore(cid,iwr.id,cat.id)>0)).length;
+  return{pct,catAvgs,scoredBy};
+}
+function iwrProgress(cid,iid){
+  const c=S.candidates.find(x=>x.id===cid);
+  const cats=c?getCatsForRole(c.role):CATS;
+  return cats.filter(cat=>getScore(cid,iid,cat.id)>0).length;
+}
+
+/* GOOGLE APPS SCRIPT */
+async function gasPost(body){
+  const url=S.gasUrl;
+  if(!url||!url.startsWith('http'))throw new Error('No Web App URL');
+  const res=await fetch(url,{method:'POST',body:JSON.stringify(body),headers:{'Content-Type':'text/plain'}});
+  const txt=await res.text();
+  try{return JSON.parse(txt);}catch(e){throw new Error('Invalid response: '+txt.slice(0,80));}
+}
+
+let _pollTimer=null,_pulling=false,_bannerTimer=null;
+
+function showSyncBanner(state){
+  const dotTxt={ok:'Synced',err:'Offline',busy:'Syncing...'};
+  const dotCls={ok:'ok',err:'err',busy:'busy'};
+  ['sc-sync-dot','res-sync-dot'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el){el.className='sync-dot '+(dotCls[state]||'');el.textContent=dotTxt[state]||'Offline';}
+  });
+  let b=document.getElementById('_sb');
+  if(!b){
+    b=document.createElement('div');b.id='_sb';
+    b.style.cssText='position:fixed;bottom:70px;left:50%;transform:translateX(-50%);padding:7px 18px;border-radius:99px;font-size:12px;font-weight:500;font-family:inherit;z-index:999;transition:opacity .4s;pointer-events:none;white-space:nowrap;box-shadow:0 2px 12px rgba(0,0,0,.15)';
+    document.body.appendChild(b);
+  }
+  if(state==='ok'){b.style.background='#0f6e56';b.style.color='#fff';b.textContent='Synced with Google Sheets';}
+  else if(state==='err'){b.style.background='#a32d2d';b.style.color='#fff';b.textContent='Offline - scores saved locally';}
+  else{b.style.background='#1a1916';b.style.color='#fff';b.textContent='Syncing...';}
+  b.style.opacity='1';
+  if(_bannerTimer)clearTimeout(_bannerTimer);
+  _bannerTimer=setTimeout(()=>{b.style.opacity='0';},state==='ok'?2000:4000);
+}
+
+async function silentPull(onDone,skipConfig){
+  if(_pulling){if(onDone)onDone(false);return;}
+  if(!S.gasUrl||!S.gasUrl.startsWith('http')){if(onDone)onDone(false);return;}
+  _pulling=true;showSyncBanner('busy');
+  try{
+    const r=await gasPost({action:'loadAll'});
+    if(!r.ok)throw new Error(r.error||'loadAll failed');
+    if(!skipConfig){
+      // Sheets is authoritative — full replace (handles deletions)
+      if(r.interviewers&&r.interviewers.length>0)S.interviewers=r.interviewers;
+      if(r.candidates&&r.candidates.length>0)S.candidates=r.candidates;
+    }
+    // Scores always deep-merged
+    if(r.scores)S.scores=deepMerge(r.scores,S.scores);
+    if(r.notes)S.notes=deepMerge(r.notes,S.notes);
+    if(r.recs)S.recs=deepMerge(r.recs,S.recs);
+    if(r.recNotes)S.recNotes=deepMerge(r.recNotes,S.recNotes);
+    saveLocal();showSyncBanner('ok');if(onDone)onDone(true);
+  }catch(e){console.warn('pull:',e.message);showSyncBanner('err');if(onDone)onDone(false);}
+  finally{_pulling=false;}
+}
+function deepMerge(sheetsObj,localObj){
+  if(!sheetsObj)return localObj||{};
+  if(!localObj)return sheetsObj;
+  const result=Object.assign({},localObj);
+  Object.keys(sheetsObj).forEach(k=>{
+    if(typeof sheetsObj[k]==='object'&&sheetsObj[k]!==null&&!Array.isArray(sheetsObj[k])&&typeof localObj[k]==='object')
+      result[k]=deepMerge(sheetsObj[k],localObj[k]);
+    else result[k]=sheetsObj[k];
+  });
+  return result;
+}
+function startPoll(){
+  stopPoll();
+  _pollTimer=setInterval(()=>{
+    silentPull(()=>{
+      if(document.getElementById('screen-scoring').classList.contains('active'))renderScoringSidebar();
+      if(document.getElementById('screen-results').classList.contains('active')){
+        renderResultsSidebar();
+        if(currentCandResults){const c=S.candidates.find(x=>x.id===currentCandResults);if(c)renderResultsSheet(c);}
+      }
+    },false);
+  },30000);
+}
+function stopPoll(){if(_pollTimer){clearInterval(_pollTimer);_pollTimer=null;}}
+
+function setSyncDot(id,state,txt){const el=document.getElementById(id);if(!el)return;el.className='sync-dot'+(state?' '+state:'');el.textContent=txt||{ok:'Synced',err:'Error',busy:'Syncing...','':'Offline'}[state]||'Offline';}
+function setConnBar(state,msg){const bar=document.getElementById('conn-bar');if(!bar)return;bar.className='conn-bar cb-'+state;bar.innerHTML='<div class="conn-dot"></div><span>'+msg+'</span>';}
+function saveGasUrl(){const v=document.getElementById('gas-url').value.trim();if(!v){alert('Paste the Web App URL');return;}S.gasUrl=v;saveLocal();testConn();}
+async function testConn(){
+  if(!S.gasUrl||!S.gasUrl.startsWith('http')){setConnBar('err','No URL');return;}
+  setConnBar('pending','Testing...');
+  try{const r=await gasPost({action:'ping'});if(r.ok){setConnBar('ok','Connected / បានភ្ជាប់');await gasPost({action:'setup'});}else setConnBar('err','Error: '+(r.error||'?'));}
+  catch(e){setConnBar('err',e.message.slice(0,60));}
+}
+async function syncNow(ctx){
+  const dId=ctx==='sc'?'sc-sync-dot':'res-sync-dot';
+  const bId=ctx==='sc'?'btn-sync-sc':'btn-sync-res';
+  const btn=document.getElementById(bId);
+  if(btn){btn.disabled=true;btn.innerHTML='<span class="spin"></span>';}
+  setSyncDot(dId,'busy');showSyncBanner('busy');
+  try{
+    const r=await gasPost({action:'syncAll',data:{interviewers:S.interviewers,candidates:S.candidates,scores:S.scores,notes:S.notes,recs:S.recs,recNotes:S.recNotes}});
+    if(r.ok){setSyncDot(dId,'ok','Synced');showSyncBanner('ok');silentPull(()=>{renderScoringSidebar();renderResultsSidebar();if(currentCandResults){const c=S.candidates.find(x=>x.id===currentCandResults);if(c)renderResultsSheet(c);}},false);}
+    else{setSyncDot(dId,'err','Error');showSyncBanner('err');}
+  }catch(e){setSyncDot(dId,'err','Error');showSyncBanner('err');}
+  finally{if(btn){btn.disabled=false;btn.innerHTML=ctx==='sc'?'Sync':'&#8593;';}}
+}
+async function pushScore(cid,iid,catId){
+  if(!S.gasUrl||!S.gasUrl.startsWith('http'))return;
+  const c=S.candidates.find(x=>x.id===cid);const iwr=S.interviewers.find(x=>x.id===iid);
+  if(!c||!iwr)return;
+  try{await gasPost({action:'saveScore',data:{candidateId:cid,candidateName:c.name,role:c.role,interviewerId:iid,interviewerName:iwr.name,catId,score:getScore(cid,iid,catId),notes:getNote(cid,iid,catId)}});}
+  catch(e){console.warn('pushScore',e);}
+}
+async function pushRec(cid,iid){
+  if(!S.gasUrl||!S.gasUrl.startsWith('http'))return;
+  const c=S.candidates.find(x=>x.id===cid);const iwr=S.interviewers.find(x=>x.id===iid);
+  if(!c||!iwr)return;
+  try{await gasPost({action:'saveRecommendation',data:{candidateId:cid,candidateName:c.name,role:c.role,interviewerId:iid,interviewerName:iwr.name,rec:getRec(cid,iid),notes:getRecNote(cid,iid)}});}
+  catch(e){console.warn('pushRec',e);}
+}
+async function pullSheets(){
+  if(!S.gasUrl||!S.gasUrl.startsWith('http')){alert('No Web App URL configured.');return;}
+  const btn=document.getElementById('btn-pull');
+  if(btn){btn.disabled=true;btn.innerHTML='<span class="spin spin-teal"></span>';}
+  try{
+    const r=await gasPost({action:'loadAll'});
+    if(!r.ok)throw new Error(r.error||'Failed');
+    if(r.interviewers&&r.interviewers.length>0)S.interviewers=r.interviewers;
+    if(r.candidates&&r.candidates.length>0)S.candidates=r.candidates;
+    if(r.scores)S.scores=deepMerge(r.scores,S.scores);
+    if(r.notes)S.notes=deepMerge(r.notes,S.notes);
+    if(r.recs)S.recs=deepMerge(r.recs,S.recs);
+    if(r.recNotes)S.recNotes=deepMerge(r.recNotes,S.recNotes);
+    saveLocal();renderSetup();renderResultsSidebar();
+    if(currentCandResults){const c=S.candidates.find(x=>x.id===currentCandResults);if(c)renderResultsSheet(c);}
+    renderScoringSidebar();showSyncBanner('ok');alert('Synced from Google Sheets');
+  }catch(e){alert('Pull failed: '+e.message);}
+  finally{if(btn){btn.disabled=false;btn.textContent='&#8595;';}}
+}
+
+/* SCREENS */
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('screen-'+id).classList.add('active');}
+function goSetup(){stopPoll();showScreen('setup');renderSetup();}
+function goLogin(){
+  showScreen('login');renderLogin();
+  if(S.gasUrl&&S.gasUrl.startsWith('http'))silentPull(()=>renderLogin(),false);
+}
+function goLoginAfterLaunch(){showScreen('login');renderLogin();}
+function goResults(){
+  showScreen('results');renderResultsSidebar();
+  currentCandResults=null;
+  document.getElementById('res-empty').style.display='flex';
+  document.getElementById('res-sheet').style.display='none';
+  startPoll();
+  silentPull(()=>{renderResultsSidebar();},false);
+}
+
+/* SIDEBAR TOGGLE */
+function toggleSidebar(){
+  const sb=document.getElementById('sc-sidebar');
+  const ov=document.getElementById('sc-overlay');
+  const open=!sb.classList.contains('open');
+  sb.classList.toggle('open',open);ov.classList.toggle('active',open);
+}
+function closeSidebar(){document.getElementById('sc-sidebar').classList.remove('open');document.getElementById('sc-overlay').classList.remove('active');}
+function toggleResultsSidebar(){
+  const sb=document.getElementById('res-sidebar');
+  const ov=document.getElementById('res-overlay');
+  const open=!sb.classList.contains('open');
+  sb.classList.toggle('open',open);ov.classList.toggle('active',open);
+}
+function closeResultsSidebar(){document.getElementById('res-sidebar').classList.remove('open');document.getElementById('res-overlay').classList.remove('active');}
+
+/* SETUP */
+function renderSetup(){
+  if(S.gasUrl)document.getElementById('gas-url').value=S.gasUrl;
+  const chips=document.getElementById('iwr-chips');
+  chips.innerHTML=S.interviewers.map(i=>'<div class="chip"><div class="chip-av">'+initials(i.name)+'</div>'+i.name+'<span class="chip-x" onclick="removeIwr(\''+i.id+'\')">x</span></div>').join('');
+  document.getElementById('iwr-msg').textContent=S.interviewers.length+' interviewer'+(S.interviewers.length!==1?'s':'')+' (recommended 5-7)';
+  const list=document.getElementById('cand-list-setup');
+  list.innerHTML=S.candidates.length?S.candidates.map(c=>
+    '<div class="cand-row"><div class="si-av '+roleAv(c.role)+'">'+initials(c.name)+'</div>'+
+    '<div class="cand-row-info"><div class="cand-row-name">'+c.name+'</div><div class="cand-row-sub">'+c.candidateId+' - '+roleLabel(c.role)+'</div></div>'+
+    '<span class="cand-del" onclick="removeCand(\''+c.id+'\')">x</span></div>').join('')
+    :'<p style="font-size:11px;color:var(--ink3);padding:6px 0">No candidates / គ្មានបេក្ខជន</p>';
+  const role=document.getElementById('c-role').value;
+  const n=S.candidates.filter(c=>c.role===role).length+1;
+  const pfx={doctor:'MD',nurse:'RN',receptionist:'RC',pro:'PR'};
+  document.getElementById('c-id').value=(pfx[role]||'CS')+'-'+String(n).padStart(3,'0');
+}
+function addIwr(){
+  const inp=document.getElementById('iwr-inp');const name=inp.value.trim();
+  if(!name)return;
+  if(S.interviewers.length>=12){alert('Max 12 interviewers');return;}
+  S.interviewers.push({id:'iwr_'+Date.now(),name});inp.value='';saveLocal();renderSetup();
+  if(S.gasUrl&&S.gasUrl.startsWith('http'))gasPost({action:'saveInterviewers',data:{interviewers:S.interviewers}}).catch(()=>{});
+}
+function removeIwr(id){
+  S.interviewers=S.interviewers.filter(i=>i.id!==id);saveLocal();renderSetup();
+  if(S.gasUrl&&S.gasUrl.startsWith('http'))gasPost({action:'saveInterviewers',data:{interviewers:S.interviewers}}).catch(()=>{});
+}
+function addCand(){
+  const name=document.getElementById('c-name').value.trim();
+  if(!name){alert('Enter candidate name');return;}
+  const role=document.getElementById('c-role').value;
+  const cid=document.getElementById('c-id').value.trim();
+  S.candidates.push({id:'c_'+Date.now(),name,role,candidateId:cid,date:new Date().toLocaleDateString('en-GB')});
+  document.getElementById('c-name').value='';saveLocal();renderSetup();
+  if(S.gasUrl&&S.gasUrl.startsWith('http'))gasPost({action:'saveCandidates',data:{candidates:S.candidates}}).catch(()=>{});
+}
+function removeCand(id){
+  if(!confirm('Remove candidate?'))return;
+  S.candidates=S.candidates.filter(c=>c.id!==id);saveLocal();renderSetup();
+  if(S.gasUrl&&S.gasUrl.startsWith('http'))gasPost({action:'saveCandidates',data:{candidates:S.candidates}}).catch(()=>{});
+}
+function loadDemo(){
+  S.interviewers=[{id:'iwr1',name:'Dr. Yeap Kong'},{id:'iwr2',name:'Dr. Ouk Molyvann'},{id:'iwr3',name:'Mrs. Chou Sopheaktra'},{id:'iwr4',name:'Dr. Sok Kong'},{id:'iwr5',name:'Dr. Von Thevy'},{id:'iwr6',name:'Dr. Hing Narat'}];
+  S.candidates=[{id:'c1',name:'Chan Sopheap',role:'doctor',candidateId:'MD-001',date:'28/03/2026'},{id:'c2',name:'Keo Dara',role:'nurse',candidateId:'RN-001',date:'28/03/2026'},{id:'c3',name:'Sok Pisey',role:'receptionist',candidateId:'RC-001',date:'28/03/2026'},{id:'c4',name:'Noun Dina',role:'pro',candidateId:'PR-001',date:'28/03/2026'}];
+  saveLocal();renderSetup();
+}
+async function launchSession(){
+  if(!S.interviewers.length){alert('Add at least one interviewer');return;}
+  if(!S.candidates.length){alert('Add at least one candidate');return;}
+  S.sessionOpen=true;saveLocal();
+  if(S.gasUrl&&S.gasUrl.startsWith('http')){
+    const btn=document.querySelector('[onclick="launchSession()"]');
+    if(btn){btn.disabled=true;btn.innerHTML='<span class="spin"></span> Saving...';}
+    showSyncBanner('busy');
+    try{
+      await gasPost({action:'syncAll',data:{interviewers:S.interviewers,candidates:S.candidates,scores:S.scores,notes:S.notes,recs:S.recs,recNotes:S.recNotes}});
+      showSyncBanner('ok');
+    }catch(e){showSyncBanner('err');}
+    if(btn){btn.disabled=false;btn.textContent='Launch Session >';}
+  }
+  goLoginAfterLaunch();
+}
+
+/* LOGIN */
+function renderLogin(){
+  loginSel=null;
+  const list=document.getElementById('login-iwr-list');
+  list.innerHTML=S.interviewers.map(i=>
+    '<button class="iwr-btn" id="lbtn-'+i.id+'" onclick="selLoginIwr(\''+i.id+'\')">'+
+    '<div class="iwr-av">'+initials(i.name)+'</div>'+i.name+'</button>').join('');
+  const syn=document.getElementById('login-sync-msg');
+  syn.innerHTML=S.gasUrl&&S.gasUrl.startsWith('http')
+    ?'<div class="conn-bar cb-ok" style="justify-content:center"><div class="conn-dot"></div><span>Sheets connected / ភ្ជាប់ Google Sheets</span></div>'
+    :'<div class="conn-bar cb-idle" style="justify-content:center"><div class="conn-dot"></div><span>Offline mode / មុខងារក្នុង</span></div>';
+}
+function selLoginIwr(id){
+  loginSel=id;
+  document.querySelectorAll('.iwr-btn').forEach(b=>b.classList.remove('sel'));
+  const btn=document.getElementById('lbtn-'+id);if(btn)btn.classList.add('sel');
+}
+function loginIwr(){
+  if(!loginSel){alert('Select your name / ជ្រើសឈ្មោះ');return;}
+  currentIwr=S.interviewers.find(i=>i.id===loginSel);
+  showScreen('scoring');renderScoringScreen();
+}
+
+/* SCORING SCREEN */
+function renderScoringScreen(){
+  document.getElementById('sc-iwr-label').textContent=currentIwr.name;
+  renderScoringSidebar();
+  currentCandScore=null;
+  document.getElementById('sc-empty').style.display='flex';
+  document.getElementById('sc-sheet').style.display='none';
+  setSyncDot('sc-sync-dot','',S.gasUrl&&S.gasUrl.startsWith('http')?'Connected':'Offline');
+  startPoll();
+  silentPull(()=>renderScoringSidebar(),false);
+}
+
+function renderScoringSidebar(){
+  const iid=currentIwr.id;
+  let html='';
+  [['Medical Doctors / វេជ្ជបណ្ឌិត',S.candidates.filter(c=>c.role==='doctor')],
+   ['Nurses / គិលានុបដ្ឋាក',S.candidates.filter(c=>c.role==='nurse')],
+   ['Receptionists / អ្នកទទួលភ្ញៀវ',S.candidates.filter(c=>c.role==='receptionist')],
+   ['Patient Relations / មន្ត្រីទំនាក់ទំនង',S.candidates.filter(c=>c.role==='pro')]
+  ].forEach(([lbl,arr])=>{
+    if(!arr.length)return;
+    html+='<div style="font-size:9px;font-weight:700;letter-spacing:.06em;color:var(--ink4);text-transform:uppercase;padding:5px 9px 3px">'+lbl+'</div>';
+    arr.forEach(c=>{
+      const sc=calcIwrScore(c.id,iid);const prog=iwrProgress(c.id,iid);
+      const cats=getCatsForRole(c.role);
+      html+='<div class="sb-item'+(c.id===currentCandScore?' active':'')+'" onclick="selectCandScore(\''+c.id+'\')">'
+        +'<div class="si-av '+roleAv(c.role)+'">'+initials(c.name)+'</div>'
+        +'<div class="si-info"><div class="si-name">'+c.name+'</div><div class="si-sub">'+c.candidateId+' - '+prog+'/'+cats.length+'</div></div>'
+        +'<span class="si-pct '+pctClass(sc.answered>0?sc.pct:0)+'">'+( sc.answered>0?sc.pct+'%':'--')+'</span>'
+        +'</div>';
+    });
+  });
+  document.getElementById('sc-cand-list').innerHTML=html;
+  const scored=S.candidates.filter(c=>{const cats=getCatsForRole(c.role);return iwrProgress(c.id,iid)===cats.length;}).length;
+  document.getElementById('sc-stat-scored').textContent=scored;
+  document.getElementById('sc-stat-total').textContent=S.candidates.length;
+}
+
+function selectCandScore(cid){
+  currentCandScore=cid;
+  renderScoringSidebar();
+  const c=S.candidates.find(x=>x.id===cid);
+  document.getElementById('sc-empty').style.display='none';
+  document.getElementById('sc-sheet').style.display='block';
+  try{renderScoreSheet(c);}catch(err){document.getElementById('sc-sheet').innerHTML='<div style="padding:20px;background:#fcebeb;border-radius:10px;color:#a32d2d"><strong>Error:</strong><br>'+err.message+'<br><br>Hard-refresh (Cmd+Shift+R) and try again.</div>';}
+  const main=document.getElementById('sc-main');if(main)main.scrollTop=0;
+  setTimeout(()=>closeSidebar(),10);
+}
+
+function renderScoreSheet(c){
+  const iid=currentIwr.id;
+  const cats=getCatsForRole(c.role);
+  const sc=calcIwrScore(c.id,iid);
+  let html='<div class="cand-hdr">'
+    +'<div class="cand-av '+roleAv(c.role)+'">'+initials(c.name)+'</div>'
+    +'<div class="cand-meta" style="flex:1;min-width:0">'
+    +'<h2>'+c.name+'<span class="rp '+rolePill(c.role)+'">'+roleCode(c.role)+'</span></h2>'
+    +'<p>'+c.candidateId+' - '+c.date+'</p>'
+    +'<div class="prog-wrap"><div class="prog-track"><div class="prog-fill" style="width:'+( sc.answered/cats.length*100)+'%"></div></div>'
+    +'<span class="prog-txt">'+sc.answered+'/'+cats.length+' - '+sc.pct+'%</span></div>'
+    +'</div></div>';
+  cats.forEach(cat=>{
+    const s=getScore(c.id,iid,cat.id);
+    const note=getNote(c.id,iid,cat.id);
+    const qKey=cat.q[c.role]?c.role:(cat.q.nurse?'nurse':'receptionist');
+    const q=cat.q[qKey]||cat.q[Object.keys(cat.q)[0]];
+    const rubEn=s?cat.rubric.en[s-1]:'';
+    const rubKm=s?cat.rubric.km[s-1]:'';
+    html+='<div class="cat-sec" id="cats-'+cat.id+'">'
+      +'<div class="cat-hdr" onclick="toggleCat(\''+cat.id+'\',\'s\')">'
+      +'<div class="cat-ico" style="background:'+cat.bg+'">'+cat.ico+'</div>'
+      +'<div class="cat-titles"><div class="cat-name-en">'+cat.en+'</div><div class="cat-name-km km">'+cat.km+'</div></div>'
+      +'<div class="cat-wt">x'+cat.w+'%</div>'
+      +'<span class="cat-pill '+pctClass(s?Math.round(s/5*100):0)+'">'+( s?s+'/5':'--')+'</span>'
+      +'<span class="chev open" id="chev-s-'+cat.id+'">v</span>'
+      +'</div>'
+      +'<div class="cat-body" id="catbody-s-'+cat.id+'">'
+      +'<div class="q-lbl">Question / <span class="km">សំណួរ</span></div>'
+      +'<div class="q-box"><div class="en">'+q.en+'</div><div class="km">'+q.km+'</div></div>'
+      +'<div class="q-lbl">Your score (1=Poor to 5=Excellent) / <span class="km">ពិន្ទុ</span></div>'
+      +'<div class="score-row">'
+      +[1,2,3,4,5].map(n=>'<button class="s-btn'+(s===n?' v'+n:'')+'" onclick="doScore(\''+c.id+'\',\''+iid+'\',\''+cat.id+'\','+n+')">'
+        +'<span class="sn">'+n+'</span><span class="sl">'+['Poor','Weak','Fair','Good','Excel'][n-1]+'</span></button>').join('')
+      +'</div>'
+      +(s?'<div class="rubric-hint">'+rubEn+'<br><span class="km">'+rubKm+'</span></div>':'')
+      +'<div class="q-lbl" style="margin-top:8px">Notes / <span class="km">កំណត់ចំណាំ</span></div>'
+      +'<textarea class="note-field" placeholder="Notes..." onblur="doNote(\''+c.id+'\',\''+iid+'\',\''+cat.id+'\',this.value)">'+note+'</textarea>'
+      +'</div></div>';
+  });
+  const rec=getRec(c.id,iid);const recNote=getRecNote(c.id,iid);
+  html+='<div class="rec-sec">'
+    +'<div style="font-size:12px;font-weight:600;margin-bottom:2px">Recommendation / <span class="km">អនុសាសន៍</span></div>'
+    +'<div class="rec-btns">'
+    +'<button class="rec-btn'+(rec==='hire'?' r-hire':'')+'" onclick="doRec(\''+c.id+'\',\''+iid+'\',\'hire\')">Recommend hire<span class="km">ណែនាំ</span></button>'
+    +'<button class="rec-btn'+(rec==='hold'?' r-hold':'')+'" onclick="doRec(\''+c.id+'\',\''+iid+'\',\'hold\')">Hold / waitlist<span class="km">បម្រុង</span></button>'
+    +'<button class="rec-btn'+(rec==='decl'?' r-decl':'')+'" onclick="doRec(\''+c.id+'\',\''+iid+'\',\'decl\')">Do not recommend<span class="km">មិនណែនាំ</span></button>'
+    +'</div>'
+    +'<textarea class="note-field" style="min-height:72px" placeholder="Overall impression..." onblur="doRecNote(\''+c.id+'\',\''+iid+'\',this.value)">'+recNote+'</textarea>'
+    +'</div>';
+  document.getElementById('sc-sheet').innerHTML=html;
+}
+
+function toggleCat(id,p){
+  const b=document.getElementById('catbody-'+p+'-'+id);
+  const ch=document.getElementById('chev-'+p+'-'+id);
+  if(!b)return;
+  const hidden=b.style.display==='none';
+  b.style.display=hidden?'':'none';
+  if(ch)ch.classList.toggle('open',hidden);
+}
+function doScore(cid,iid,catId,v){setScore(cid,iid,catId,v);pushScore(cid,iid,catId);const c=S.candidates.find(x=>x.id===cid);renderScoreSheet(c);renderScoringSidebar();}
+function doNote(cid,iid,catId,v){setNote(cid,iid,catId,v);pushScore(cid,iid,catId);}
+function doRec(cid,iid,v){setRecLocal(cid,iid,v);pushRec(cid,iid);const c=S.candidates.find(x=>x.id===cid);renderScoreSheet(c);}
+function doRecNote(cid,iid,v){setRecNoteLocal(cid,iid,v);pushRec(cid,iid);}
+
+/* RESULTS SCREEN */
+function renderResultsSidebar(){
+  const sorted=role=>S.candidates.filter(c=>c.role===role).sort((a,b)=>calcAvgScore(b.id).pct-calcAvgScore(a.id).pct);
+  let html='';
+  [['Medical Doctors',sorted('doctor')],['Nurses',sorted('nurse')],['Receptionists',sorted('receptionist')],['Patient Relations',sorted('pro')]
+  ].forEach(([lbl,arr])=>{
+    if(!arr.length)return;
+    html+='<div style="font-size:9px;font-weight:700;letter-spacing:.06em;color:var(--ink4);text-transform:uppercase;padding:5px 9px 3px">'+lbl+'</div>';
+    arr.forEach(c=>{
+      const avg=calcAvgScore(c.id);
+      html+='<div class="sb-item'+(c.id===currentCandResults?' active':'')+'" onclick="selectCandResults(\''+c.id+'\');closeResultsSidebar()">'
+        +'<div class="si-av '+roleAv(c.role)+'">'+initials(c.name)+'</div>'
+        +'<div class="si-info"><div class="si-name">'+c.name+'</div><div class="si-sub">'+c.candidateId+' - '+avg.scoredBy+' scorer'+(avg.scoredBy!==1?'s':'')+'</div></div>'
+        +'<span class="si-pct '+pctClass(avg.pct)+'">'+( avg.scoredBy>0?avg.pct+'%':'--')+'</span></div>';
+    });
+  });
+  document.getElementById('res-cand-list').innerHTML=html;
+  document.getElementById('res-doc').textContent=S.candidates.filter(c=>c.role==='doctor').length;
+  document.getElementById('res-nur').textContent=S.candidates.filter(c=>c.role==='nurse').length;
+  document.getElementById('res-iwr').textContent=S.interviewers.length;
+}
+
+function selectCandResults(cid){
+  currentCandResults=cid;renderResultsSidebar();
+  const c=S.candidates.find(x=>x.id===cid);
+  document.getElementById('res-empty').style.display='none';
+  document.getElementById('res-sheet').style.display='block';
+  try{renderResultsSheet(c);}catch(err){document.getElementById('res-sheet').innerHTML='<div style="padding:20px;background:#fcebeb;border-radius:10px;color:#a32d2d"><strong>Error:</strong><br>'+err.message+'</div>';}
+  const main=document.getElementById('res-main');if(main)main.scrollTop=0;
+}
+
+function renderResultsSheet(c){
+  const cats=getCatsForRole(c.role);
+  const avg=calcAvgScore(c.id);
+  const recCounts={hire:0,hold:0,decl:0};
+  S.interviewers.forEach(iwr=>{const r=getRec(c.id,iwr.id);if(r&&recCounts[r]!==undefined)recCounts[r]++;});
+  const totalRec=Object.values(recCounts).reduce((a,b)=>a+b,0);
+  const cons=totalRec>0?Object.entries(recCounts).sort((a,b)=>b[1]-a[1])[0][0]:'';
+  const consLabel={hire:'Recommend Hire / ណែនាំ',hold:'Hold / បម្រុង',decl:'Decline / មិនណែនាំ','':'Pending / រង់ចាំ'}[cons];
+  const consColor={hire:'var(--teal)',hold:'var(--amber)',decl:'var(--red)','':'var(--ink3)'}[cons];
+
+  let html='<!-- PDF button -->'
+    +'<button class="pdf-btn" onclick="generatePDF(\''+c.id+'\')">&#128196; Download PDF Report / ទាញយករបាយការណ៍</button>'
+    +'<div class="cand-hdr">'
+    +'<div class="cand-av '+roleAv(c.role)+'">'+initials(c.name)+'</div>'
+    +'<div class="cand-meta" style="flex:1;min-width:0">'
+    +'<h2>'+c.name+'<span class="rp '+rolePill(c.role)+'">'+roleCode(c.role)+'</span></h2>'
+    +'<p>'+c.candidateId+' - '+c.date+' - '+avg.scoredBy+'/'+S.interviewers.length+' scorers</p>'
+    +'</div></div>'
+    +'<div class="sum-grid">'
+    +'<div class="sum-card"><div class="sum-lbl">Avg Score<br><span class="km">ពិន្ទុមធ្យម</span></div><div class="sum-val sv-teal">'+avg.pct+'%</div></div>'
+    +'<div class="sum-card"><div class="sum-lbl">Scorers<br><span class="km">អ្នកសម្ភាស</span></div><div class="sum-val sv-ink">'+avg.scoredBy+'/'+S.interviewers.length+'</div></div>'
+    +'<div class="sum-card"><div class="sum-lbl">Hire votes<br><span class="km">ណែនាំ</span></div><div class="sum-val sv-amber">'+recCounts.hire+'</div></div>'
+    +'<div class="sum-card"><div class="sum-lbl">Consensus<br><span class="km">ការយល់ស្រប</span></div><div style="font-size:12px;font-weight:700;margin-top:6px;color:'+consColor+'">'+consLabel+'</div></div>'
+    +'</div>'
+    +'<div class="card card-pad">'
+    +'<div style="font-size:12px;font-weight:700;margin-bottom:10px">Category averages / <span class="km" style="font-size:13px">ពិន្ទុមធ្យមតាមក្រុម</span></div>'
+    +cats.map(cat=>{
+      const a=avg.catAvgs[cat.id];const pct=a>0?Math.round(a/5*100):0;
+      return '<div class="avg-bar">'
+        +'<div class="avg-bar-lbl">'+cat.ico+' '+cat.en.split(' ')[0]+'</div>'
+        +'<div class="avg-bar-track"><div class="avg-bar-fill" style="width:'+pct+'%"></div></div>'
+        +'<div class="avg-bar-val">'+(a>0?a.toFixed(1):'--')+'</div>'
+        +'</div>';}).join('')
+    +'</div>';
+
+  cats.forEach(cat=>{
+    const qKey=cat.q[c.role]?c.role:(cat.q.nurse?'nurse':'receptionist');
+    const q=cat.q[qKey]||cat.q[Object.keys(cat.q)[0]];
+    let sum=0,n=0;
+    S.interviewers.forEach(iwr=>{const s=getScore(c.id,iwr.id,cat.id);if(s>0){sum+=s;n++;}});
+    const catAvg=n>0?(sum/n).toFixed(1):null;
+    html+='<div class="cat-sec">'
+      +'<div class="cat-hdr" onclick="toggleCat(\''+cat.id+'\',\'r\')">'
+      +'<div class="cat-ico" style="background:'+cat.bg+'">'+cat.ico+'</div>'
+      +'<div class="cat-titles"><div class="cat-name-en">'+cat.en+'</div><div class="cat-name-km km">'+cat.km+'</div></div>'
+      +'<div class="cat-wt">x'+cat.w+'%</div>'
+      +'<span class="cat-pill '+pctClass(catAvg?Math.round(catAvg/5*100):0)+'">'+( catAvg?'Avg '+catAvg:'--')+'</span>'
+      +'<span class="chev open" id="chev-r-'+cat.id+'">v</span>'
+      +'</div>'
+      +'<div class="cat-body" id="catbody-r-'+cat.id+'">'
+      +'<div class="q-lbl">Question / <span class="km">សំណួរ</span></div>'
+      +'<div class="q-box"><div class="en">'+q.en+'</div><div class="km">'+q.km+'</div></div>'
+      +'<div class="q-lbl" style="margin-top:8px">Scores by interviewer / <span class="km">ពិន្ទុតាមអ្នកសម្ភាស</span></div>'
+      +'<div class="iwr-grid">'
+      +S.interviewers.map(iwr=>{
+        const s=getScore(c.id,iwr.id,cat.id);const note=getNote(c.id,iwr.id,cat.id);
+        return '<div class="iwr-card"><div class="iwr-name">'+iwr.name+'</div>'
+          +'<div class="iwr-score-row">'+[1,2,3,4,5].map(n=>'<div class="isb'+(s===n?' v'+n:'')+'">'+(s===n?n:'')+'</div>').join('')+'</div>'
+          +(s?'<div class="iwr-avg-badge">'+s+'/5</div>':'')
+          +(note?'<div class="iwr-note-txt">"'+note+'"</div>':'')
+          +'</div>';}).join('')
+      +'</div></div></div>';
+  });
+
+  html+='<div class="rec-sec">'
+    +'<div style="font-size:12px;font-weight:700;margin-bottom:10px">Recommendations / <span class="km">អនុសាសន៍</span></div>'
+    +'<div class="iwr-grid">'
+    +S.interviewers.map(iwr=>{
+      const r=getRec(c.id,iwr.id);const rn=getRecNote(c.id,iwr.id);
+      const rL={hire:'Recommend hire',hold:'Hold/waitlist',decl:'Do not recommend','':'(pending)'};
+      const rCls={hire:'r-hire',hold:'r-hold',decl:'r-decl','':''};
+      return '<div class="iwr-card"><div class="iwr-name">'+iwr.name+'</div>'
+        +'<span class="rec-btn '+rCls[r||'']+'" style="cursor:default;display:inline-block;margin-bottom:4px;padding:4px 8px;font-size:10px">'+(rL[r||'']||rL[''])+'</span>'
+        +(rn?'<div class="iwr-note-txt">"'+rn+'"</div>':'')+'</div>';}).join('')
+    +'</div>'
+    +'<div style="font-size:11px;font-weight:600;color:var(--ink2);margin:10px 0 4px">Panel consensus / <span class="km">ការយល់ស្របក្រុម</span></div>'
+    +'<div class="con-pills">'
+    +(recCounts.hire>0?'<span class="con-pill con-hire">Hire: '+recCounts.hire+'</span>':'')
+    +(recCounts.hold>0?'<span class="con-pill con-hold">Hold: '+recCounts.hold+'</span>':'')
+    +(recCounts.decl>0?'<span class="con-pill con-decl">Decline: '+recCounts.decl+'</span>':'')
+    +(totalRec===0?'<span style="font-size:11px;color:var(--ink3)">No recommendations yet / មិនទាន់មានអនុសាសន៍</span>':'')
+    +'</div></div>'
+    +'<div class="card card-pad">'
+    +'<div style="font-size:12px;font-weight:700;margin-bottom:8px">Inter-rater comparison / <span class="km">ការប្រៀបធៀប</span></div>'
+    +'<div class="tbl-wrap"><table class="itr-tbl"><thead><tr>'
+    +'<th>Interviewer / អ្នកសម្ភាស</th>'
+    +cats.map(cat=>'<th title="'+cat.en+'">'+cat.ico+'</th>').join('')
+    +'<th>%</th></tr></thead><tbody>'
+    +S.interviewers.map(iwr=>{
+      const sc=calcIwrScore(c.id,iwr.id);
+      return '<tr><td style="font-weight:500;white-space:nowrap">'+iwr.name+'</td>'
+        +cats.map(cat=>{const s=getScore(c.id,iwr.id,cat.id);return '<td style="text-align:center"><span class="si-pct '+pctClass(s?Math.round(s/5*100):0)+'">'+(s||'--')+'</span></td>';}).join('')
+        +'<td style="text-align:center;font-weight:700;color:var(--teal)">'+(sc.answered>0?sc.pct+'%':'--')+'</td></tr>';}).join('')
+    +'<tr class="avg-row"><td>Average / មធ្យម</td>'
+    +cats.map(cat=>{const a=avg.catAvgs[cat.id];return '<td style="text-align:center">'+(a>0?a.toFixed(1):'--')+'</td>';}).join('')
+    +'<td style="text-align:center">'+(avg.pct?avg.pct+'%':'--')+'</td></tr>'
+    +'</tbody></table></div></div>';
+
+  document.getElementById('res-sheet').innerHTML=html;
+}
+
+/* PDF — BROWSER PRINT APPROACH (renders Khmer correctly) */
+async function generatePDF(cid){
+  const c=S.candidates.find(x=>x.id===cid);if(!c)return;
+  // Pull all latest scores first
+  if(S.gasUrl&&S.gasUrl.startsWith('http')){
+    const btn=document.activeElement;
+    if(btn&&btn.tagName==='BUTTON'){btn.disabled=true;btn.textContent='Loading scores...';}
+    await new Promise(resolve=>silentPull(resolve,false));
+    if(btn&&btn.tagName==='BUTTON'){btn.disabled=false;btn.innerHTML='&#128196; Download PDF Report / ទាញយករបាយការណ៍';}
+  }
+  const cats=getCatsForRole(c.role);
+  const avg=calcAvgScore(c.id);
+  const rc={hire:0,hold:0,decl:0};
+  S.interviewers.forEach(iwr=>{const r=getRec(c.id,iwr.id);if(r&&rc[r]!==undefined)rc[r]++;});
+  const tot=rc.hire+rc.hold+rc.decl;
+  const ck=tot>0?Object.entries(rc).sort((a,b)=>b[1]-a[1])[0][0]:'';
+  const cL={hire:'Recommend Hire',hold:'Hold / Waitlist',decl:'Do Not Recommend','':'Pending'}[ck];
+  const cCol={hire:'#0f6e56',hold:'#ba7517',decl:'#a32d2d','':'#888580'}[ck];
+  const rNames={doctor:'Medical Doctor',nurse:'Registered Nurse',receptionist:'Receptionist',pro:'Patient Relations Officer'};
+  const today=new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'});
+  function sBg(s){return s>=4?'#e1f5ee':s>=3?'#faeeda':s>=1?'#fcebeb':'#f3f1ed';}
+  function sCl(s){return s>=4?'#0f6e56':s>=3?'#ba7517':s>=1?'#a32d2d':'#888580';}
+  function pBar(v,label,w){
+    var p=v>0?Math.round(v/5*100):0,col=p>=70?'#1d9e75':p>=50?'#ef9f27':'#e24b4a';
+    return '<div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">'
+      +'<div style="width:140px;font-size:11px;flex-shrink:0">'+label+'</div>'
+      +'<div style="flex:1;height:7px;background:#e8e5e0;border-radius:4px;overflow:hidden">'
+        +'<div style="width:'+p+'%;height:100%;background:'+col+';border-radius:4px"></div></div>'
+      +'<div style="width:36px;font-size:11px;font-weight:700;color:'+col+';text-align:right">'+(v>0?v.toFixed(1)+'/5':'--')+'</div>'
+      +'<div style="width:28px;font-size:9px;color:#b8b5b0;text-align:right">x'+w+'%</div></div>';
+  }
+  const catBars=cats.map(cat=>pBar(avg.catAvgs[cat.id]||0,cat.en,cat.w)).join('');
+  const catBreak=cats.map(cat=>{
+    var a=avg.catAvgs[cat.id]||0,qKey=cat.q[c.role]?c.role:(cat.q.nurse?'nurse':'receptionist'),q=cat.q[qKey]||cat.q[Object.keys(cat.q)[0]];
+    var rows=S.interviewers.map(iwr=>{
+      var s=getScore(c.id,iwr.id,cat.id),note=getNote(c.id,iwr.id,cat.id),rub=s?cat.rubric.en[s-1]:'';
+      return '<tr><td style="padding:5px 8px;border-bottom:1px solid #f3f1ed;font-size:11px">'+iwr.name+'</td>'
+        +'<td style="padding:5px 8px;text-align:center;border-bottom:1px solid #f3f1ed">'+(s?'<span style="display:inline-block;padding:2px 8px;border-radius:4px;font-weight:700;font-size:12px;background:'+sBg(s)+';color:'+sCl(s)+'">'+s+'</span>':'<span style="color:#dedad4">-</span>')+'</td>'
+        +'<td style="padding:5px 8px;font-size:10px;color:#888580;border-bottom:1px solid #f3f1ed">'+rub+(note?'<br><em>"'+note+'"</em>':'')+'</td></tr>';
+    }).join('');
+    return '<div style="margin-bottom:16px;break-inside:avoid">'
+      +'<div style="background:#f3f1ed;border-radius:6px;padding:8px 12px;display:flex;align-items:center;gap:10px;margin-bottom:8px">'
+        +'<div style="flex:1"><div style="font-size:13px;font-weight:700">'+cat.en+'</div><div style="font-size:12px;color:#888580">'+cat.km+'</div></div>'
+        +'<div style="font-size:10px;color:#888580">Weight: '+cat.w+'%</div>'
+        +'<span style="padding:3px 10px;border-radius:99px;font-size:10px;font-weight:700;background:'+sBg(a>0?Math.round(a):0)+';color:'+sCl(a>0?Math.round(a):0)+'">'+(a>0?'Avg: '+a.toFixed(1)+'/5':'Not scored')+'</span></div>'
+      +'<div style="background:#faf9f7;border-radius:4px;padding:8px 12px;margin-bottom:8px;font-size:11px;border-left:2px solid #e8e5e0">'+q.en+'</div>'
+      +'<table style="width:100%;border-collapse:collapse"><tr style="background:#f3f1ed">'
+        +'<th style="padding:4px 8px;text-align:left;font-size:10px;color:#888580">Interviewer</th>'
+        +'<th style="padding:4px 8px;text-align:center;font-size:10px;color:#888580">Score</th>'
+        +'<th style="padding:4px 8px;text-align:left;font-size:10px;color:#888580">Rubric / Notes</th></tr>'
+        +rows+'</table></div>';
+  }).join('');
+  const itrRows=S.interviewers.map(iwr=>{
+    var sc=calcIwrScore(c.id,iwr.id);
+    var cells=cats.map(cat=>{var s=getScore(c.id,iwr.id,cat.id);
+      return '<td style="text-align:center;padding:4px;border-bottom:1px solid #f3f1ed">'+(s?'<span style="display:inline-block;width:22px;height:22px;line-height:22px;border-radius:3px;font-size:10px;font-weight:700;text-align:center;background:'+sBg(s)+';color:'+sCl(s)+'">'+s+'</span>':'<span style="color:#dedad4">-</span>')+'</td>';}).join('');
+    return '<tr><td style="padding:4px 8px;font-size:11px;border-bottom:1px solid #f3f1ed">'+iwr.name+'</td>'+cells+'<td style="text-align:center;padding:4px 8px;font-weight:700;font-size:11px;color:#0f6e56;border-bottom:1px solid #f3f1ed">'+(sc.answered>0?sc.pct+'%':'-')+'</td></tr>';
+  }).join('');
+  const itrAvg=cats.map(cat=>{var a=avg.catAvgs[cat.id];return '<td style="text-align:center;padding:4px 6px;font-weight:700;color:#0f6e56;font-size:11px">'+(a>0?a.toFixed(1):'-')+'</td>';}).join('');
+  const recRows=S.interviewers.map(iwr=>{
+    var rec=getRec(c.id,iwr.id)||'',rn=getRecNote(c.id,iwr.id);
+    var rL={hire:'Recommend Hire',hold:'Hold/Waitlist',decl:'Do Not Recommend','':'Pending'};
+    return '<tr><td style="padding:6px 8px;font-size:11px;border-bottom:1px solid #f3f1ed">'+iwr.name+'</td>'
+      +'<td style="padding:6px 8px;border-bottom:1px solid #f3f1ed"><span style="padding:3px 10px;border-radius:99px;font-size:10px;font-weight:700;background:'+sBg(rec==='hire'?4:rec==='hold'?3:rec==='decl'?1:0)+';color:'+sCl(rec==='hire'?4:rec==='hold'?3:rec==='decl'?1:0)+'">'+(rL[rec]||'Pending')+'</span></td>'
+      +'<td style="padding:6px 8px;font-size:10px;color:#888580;border-bottom:1px solid #f3f1ed;font-style:italic">'+(rn?'"'+rn+'"':'')+'</td></tr>';
+  }).join('');
+  const catHeads=cats.map(cat=>'<th style="text-align:center;min-width:36px;padding:5px 4px;font-size:10px">'+cat.en.split(' ')[0]+'</th>').join('');
+  const sRef=['<div style="background:#fcebeb;border-radius:6px;padding:8px;text-align:center"><div style="font-size:18px;font-weight:800;color:#a32d2d">1</div><div style="font-size:10px;font-weight:700;color:#a32d2d">Poor</div></div>','<div style="background:#faeeda;border-radius:6px;padding:8px;text-align:center"><div style="font-size:18px;font-weight:800;color:#ba7517">2</div><div style="font-size:10px;font-weight:700;color:#ba7517">Weak</div></div>','<div style="background:#e1f5ee;border-radius:6px;padding:8px;text-align:center"><div style="font-size:18px;font-weight:800;color:#0f6e56">3</div><div style="font-size:10px;font-weight:700;color:#0f6e56">Fair</div></div>','<div style="background:#c0dd97;border-radius:6px;padding:8px;text-align:center"><div style="font-size:18px;font-weight:800;color:#27500a">4</div><div style="font-size:10px;font-weight:700;color:#27500a">Good</div></div>','<div style="background:#5dcaa5;border-radius:6px;padding:8px;text-align:center"><div style="font-size:18px;font-weight:800;color:#084030">5</div><div style="font-size:10px;font-weight:700;color:#084030">Excellent</div></div>'].join('');
+  const wScore=cats.reduce((s,cat)=>s+(avg.catAvgs[cat.id]||0)*cat.w,0).toFixed(1);
+  const H='<!DOCTYPE html><html lang="km"><head><meta charset="UTF-8">'
+    +'<meta name="viewport" content="width=device-width,initial-scale=1">'
+    +'<link href="https://fonts.googleapis.com/css2?family=Hanuman:wght@400;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">'
+    +'<title>KCPH Report '+c.candidateId+'</title>'
+    +'<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Outfit,Hanuman,sans-serif;font-size:12px;color:#1a1916;background:#fff}'
+    +'@media print{@page{size:A4;margin:12mm 14mm 15mm 14mm}.np{display:none!important}.pb{page-break-before:always}div{page-break-inside:avoid}}'
+    +'.hdr{background:#0f6e56;color:#fff;padding:7px 16px;display:flex;justify-content:space-between;font-size:9px;letter-spacing:.04em}'
+    +'.pg{padding:14px 18px 18px}.st{background:#0f6e56;color:#fff;padding:6px 12px;border-radius:4px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;margin:16px 0 10px}'
+    +'table{border-collapse:collapse;width:100%}th{background:#f3f1ed;padding:5px 8px;font-size:10px;font-weight:700;color:#888580;text-align:left}'
+    +'.pbt{position:fixed;bottom:18px;right:18px;background:#0f6e56;color:#fff;border:none;padding:12px 22px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.2);z-index:999;font-family:inherit}'
+    +'</style></head><body>'
+    +'<button class="pbt np" onclick="window.print()">Print / Save as PDF</button>'
+    +'<div class="hdr"><span>KAMPONG CHHNANG PROVINCIAL HOSPITAL - INTERVIEW SCORE REPORT</span><span>CONFIDENTIAL</span></div>'
+    +'<div class="pg">'
+      +'<div style="display:flex;align-items:center;gap:12px;margin:14px 0 18px">'
+        +'<div style="width:42px;height:42px;background:#0f6e56;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:#fff;flex-shrink:0">KC</div>'
+        +'<div><div style="font-size:17px;font-weight:700;color:#0f6e56">INTERVIEW SCORE REPORT</div>'
+        +'<div style="font-size:11px;color:#888580">Kampong Chhnang Provincial Hospital | '+today+'</div></div></div>'
+      +'<div style="border:1px solid #e8e5e0;border-radius:8px;padding:13px 15px;margin-bottom:14px;border-left:3px solid #0f6e56">'
+        +'<div style="font-size:16px;font-weight:700;margin-bottom:5px">'+c.name+'</div>'
+        +'<span style="padding:3px 10px;border-radius:99px;font-size:10px;font-weight:700;background:#e1f5ee;color:#0f6e56">'+(rNames[c.role]||c.role)+'</span>'
+        +'<div style="font-size:11px;color:#888580;margin-top:6px">ID: '+c.candidateId+' | Date: '+(c.date||'-')+' | Scorers: '+avg.scoredBy+' / '+S.interviewers.length+'</div>'
+      +'</div>'
+      +'<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:14px">'
+        +'<div style="border:1px solid #e8e5e0;border-radius:6px;padding:10px;text-align:center"><div style="font-size:9px;color:#888580;margin-bottom:3px">Average Score</div><div style="font-size:20px;font-weight:700;color:#0f6e56">'+avg.pct+'%</div></div>'
+        +'<div style="border:1px solid #e8e5e0;border-radius:6px;padding:10px;text-align:center"><div style="font-size:9px;color:#888580;margin-bottom:3px">Scorers</div><div style="font-size:20px;font-weight:700">'+avg.scoredBy+'/'+S.interviewers.length+'</div></div>'
+        +'<div style="border:1px solid #e8e5e0;border-radius:6px;padding:10px;text-align:center"><div style="font-size:9px;color:#888580;margin-bottom:3px">Hire Votes</div><div style="font-size:20px;font-weight:700;color:#ba7517">'+rc.hire+'</div></div>'
+        +'<div style="border:1px solid #e8e5e0;border-radius:6px;padding:10px;text-align:center"><div style="font-size:9px;color:#888580;margin-bottom:3px">Consensus</div><div style="font-size:12px;font-weight:700;color:'+cCol+';margin-top:4px">'+cL+'</div></div>'
+      +'</div>'
+      +'<div class="st">Category Averages</div>'+catBars
+      +'<div class="st">Score Reference</div>'
+      +'<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin-bottom:4px">'+sRef+'</div>'
+    +'</div>'
+    +'<div class="pb"></div>'
+    +'<div class="hdr"><span>KAMPONG CHHNANG PROVINCIAL HOSPITAL - INTERVIEW SCORE REPORT</span><span>CONFIDENTIAL</span></div>'
+    +'<div class="pg"><div class="st">Category-by-Category Breakdown</div>'+catBreak+'</div>'
+    +'<div class="pb"></div>'
+    +'<div class="hdr"><span>KAMPONG CHHNANG PROVINCIAL HOSPITAL - INTERVIEW SCORE REPORT</span><span>CONFIDENTIAL</span></div>'
+    +'<div class="pg">'
+      +'<div class="st">Inter-Rater Comparison Table</div>'
+      +'<table style="margin-bottom:18px;font-size:11px"><thead><tr><th style="min-width:110px">Interviewer</th>'+catHeads+'<th style="text-align:center">%</th></tr></thead>'
+        +'<tbody>'+itrRows+'</tbody>'
+        +'<tfoot><tr style="background:#e1f5ee"><td style="padding:5px 8px;font-weight:700;color:#0f6e56;font-size:11px">Average</td>'+itrAvg+'<td style="text-align:center;font-weight:700;color:#0f6e56;font-size:11px">'+(avg.pct>0?avg.pct+'%':'-')+'</td></tr></tfoot>'
+      +'</table>'
+      +'<div class="st">Individual Recommendations</div>'
+      +'<table style="margin-bottom:18px"><thead><tr><th>Interviewer</th><th>Recommendation</th><th>Notes</th></tr></thead><tbody>'+recRows+'</tbody></table>'
+      +'<div class="st" style="background:'+cCol+'">Panel Consensus</div>'
+      +'<div style="border:2px solid '+cCol+';border-radius:8px;padding:14px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between">'
+        +'<div><div style="font-size:9px;font-weight:700;color:#888580;letter-spacing:.06em;margin-bottom:4px">PANEL DECISION</div>'
+        +'<div style="font-size:18px;font-weight:800;color:'+cCol+'">'+cL.toUpperCase()+'</div></div>'
+        +'<div style="display:flex;gap:18px">'
+          +'<div style="text-align:center"><div style="font-size:22px;font-weight:800;color:#0f6e56">'+rc.hire+'</div><div style="font-size:9px;color:#888580">Hire</div></div>'
+          +'<div style="text-align:center"><div style="font-size:22px;font-weight:800;color:#ba7517">'+rc.hold+'</div><div style="font-size:9px;color:#888580">Hold</div></div>'
+          +'<div style="text-align:center"><div style="font-size:22px;font-weight:800;color:#a32d2d">'+rc.decl+'</div><div style="font-size:9px;color:#888580">Decline</div></div>'
+        +'</div></div>'
+      +'<div style="background:#f3f1ed;border-radius:6px;padding:11px 14px;margin-bottom:22px;font-size:11px;line-height:1.9">'
+        +'Role: '+(rNames[c.role]||c.role)+'<br>'
+        +'Categories: '+cats.length+' (each 1-5)<br>'
+        +'Weighted score: '+wScore+' / 500<br>'
+        +'Overall: '+avg.pct+'%<br>'
+        +'Scored by: '+avg.scoredBy+' of '+S.interviewers.length+' interviewers<br>'
+        +'Generated: '+new Date().toLocaleString('en-GB')
+      +'</div>'
+      +'<div style="border-top:1px solid #e8e5e0;padding-top:14px">'
+        +'<div style="font-size:11px;font-weight:700;margin-bottom:22px">Authorized by:</div>'
+        +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:40px">'
+          +'<div><div style="border-bottom:1px solid #1a1916;margin-bottom:4px;height:22px"></div><div style="font-size:10px;color:#888580">Panel Chair / Director</div></div>'
+          +'<div><div style="border-bottom:1px solid #1a1916;margin-bottom:4px;height:22px"></div><div style="font-size:10px;color:#888580">HR / Technical Office</div></div>'
+        +'</div></div>'
+    +'</div></body></html>';
+  var win=window.open('','_blank');
+  if(!win){
+    // Popup blocked — use blob URL as fallback (works without popup permission)
+    try{
+      var blob=new Blob([H],{type:'text/html'});
+      var url=URL.createObjectURL(blob);
+      window.location.href=url;
+    }catch(e){
+      // Last resort: open as data URI
+      var encoded='data:text/html;charset=utf-8,'+encodeURIComponent(H);
+      window.open(encoded,'_blank') || (window.location.href=encoded);
+    }
+    return;
+  }
+  win.document.write(H);win.document.close();
+  win.onload=function(){setTimeout(function(){win.focus();win.print();},900);};
+}
+
+/* INIT */
+renderSetup();
+if(S.gasUrl&&S.gasUrl.startsWith('http'))testConn();
+if(S.sessionOpen&&S.interviewers.length>0){
+  showScreen('login');renderLogin();
+  var _sk=S.candidates.length>0;
+  silentPull(function(){renderLogin();},_sk);
+}else if(!S.sessionOpen){goSetup();}
+
+</script>
+</body>
+</html>
